@@ -1,40 +1,771 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales Dashboard (Total + Renew + New) with Pipeline</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Sales Dashboard (Pilot)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
-	 <!-- DataTables CSS -->
+    <!-- DataTables CSS -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8"
+        src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
 
     <style>
-        body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
-        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .chart-container { position: relative; height: 450px; width: 100%; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 450px;
+            width: 100%;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
         /* Loading Overlay */
         #loadingOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.9); z-index: 9999;
-            display: flex; justify-content: center; align-items: center; flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
+
         .spinner {
-            border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6;
-            border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Utility - Spacing */
+        .p-6 {
+            padding: 1.5rem;
+        }
+
+        .p-2 {
+            padding: 0.5rem;
+        }
+
+        .p-4 {
+            padding: 1rem;
+        }
+
+        .px-2 {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .px-3 {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+
+        .px-4 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .px-6 {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+
+        .py-1 {
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+        }
+
+        .py-2 {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .py-3 {
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+
+        .mb-1 {
+            margin-bottom: 0.25rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-8 {
+            margin-bottom: 2rem;
+        }
+
+        .mt-2 {
+            margin-top: 0.5rem;
+        }
+
+        .mt-4 {
+            margin-top: 1rem;
+        }
+
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .mx-4 {
+            margin-left: 1rem;
+            margin-right: 1rem;
+        }
+
+        /* Utility - Flexbox */
+        .flex {
+            display: flex;
+        }
+
+        .inline-flex {
+            display: inline-flex;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .flex-1 {
+            flex: 1 1 0%;
+        }
+
+        .flex-wrap {
+            flex-wrap: wrap;
+        }
+
+        .flex-grow {
+            flex-grow: 1;
+        }
+
+        .flex-shrink-0 {
+            flex-shrink: 0;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .items-start {
+            align-items: flex-start;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .gap-3 {
+            gap: 0.75rem;
+        }
+
+        .gap-4 {
+            gap: 1rem;
+        }
+
+        .gap-6 {
+            gap: 1.5rem;
+        }
+
+        /* Utility - Grid */
+        .grid {
+            display: grid;
+        }
+
+        .grid-cols-1 {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+        }
+
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .col-span-1 {
+            grid-column: span 1 / span 1;
+        }
+
+        .col-span-2 {
+            grid-column: span 2 / span 2;
+        }
+
+        /* Utility - Typography */
+        .text-xs {
+            font-size: 0.75rem;
+            line-height: 1rem;
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+        }
+
+        .text-lg {
+            font-size: 1.125rem;
+            line-height: 1.75rem;
+        }
+
+        .text-xl {
+            font-size: 1.25rem;
+            line-height: 1.75rem;
+        }
+
+        .text-3xl {
+            font-size: 1.875rem;
+            line-height: 2.25rem;
+        }
+
+        .font-medium {
+            font-weight: 500;
+        }
+
+        .font-semibold {
+            font-weight: 600;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Utility - Colors */
+        .text-gray-400 {
+            color: #9ca3af;
+        }
+
+        .text-gray-500 {
+            color: #6b7280;
+        }
+
+        .text-gray-600 {
+            color: #4b5563;
+        }
+
+        .text-gray-700 {
+            color: #374151;
+        }
+
+        .text-gray-800 {
+            color: #1f2937;
+        }
+
+        .text-blue-600 {
+            color: #2563eb;
+        }
+
+        .text-blue-700 {
+            color: #1d4ed8;
+        }
+
+        .text-blue-900 {
+            color: #1e3a8a;
+        }
+
+        .text-green-600 {
+            color: #16a34a;
+        }
+
+        .text-green-700 {
+            color: #15803d;
+        }
+
+        .text-purple-600 {
+            color: #9333ea;
+        }
+
+        .text-purple-700 {
+            color: #7e22ce;
+        }
+
+        .text-red-600 {
+            color: #dc2626;
+        }
+
+        .text-red-700 {
+            color: #b91c1c;
+        }
+
+        .text-indigo-700 {
+            color: #4338ca;
+        }
+
+        .text-cyan-700 {
+            color: #0e7490;
+        }
+
+        .text-white {
+            color: #ffffff;
+        }
+
+        .bg-white {
+            background-color: #ffffff;
+        }
+
+        .bg-gray-50 {
+            background-color: #f9fafb;
+        }
+
+        .bg-gray-100 {
+            background-color: #f3f4f6;
+        }
+
+        .bg-gray-200 {
+            background-color: #e5e7eb;
+        }
+
+        .bg-gray-600 {
+            background-color: #4b5563;
+        }
+
+        .bg-blue-50 {
+            background-color: #eff6ff;
+        }
+
+        .bg-blue-100 {
+            background-color: #dbeafe;
+        }
+
+        .bg-blue-500 {
+            background-color: #3b82f6;
+        }
+
+        .bg-blue-600 {
+            background-color: #2563eb;
+        }
+
+        .bg-green-100 {
+            background-color: #dcfce7;
+        }
+
+        .bg-green-500 {
+            background-color: #22c55e;
+        }
+
+        .bg-green-600 {
+            background-color: #16a34a;
+        }
+
+        .bg-purple-100 {
+            background-color: #f3e8ff;
+        }
+
+        .bg-purple-500 {
+            background-color: #a855f7;
+        }
+
+        .bg-red-100 {
+            background-color: #fee2e2;
+        }
+
+        .bg-red-500 {
+            background-color: #ef4444;
+        }
+
+        .bg-indigo-100 {
+            background-color: #e0e7ff;
+        }
+
+        .bg-cyan-100 {
+            background-color: #cffafe;
+        }
+
+        .bg-orange-500 {
+            background-color: #f97316;
+        }
+
+        .bg-yellow-100 {
+            background-color: #fef9c3;
+        }
+
+        .text-yellow-700 {
+            color: #a16207;
+        }
+
+        .bg-transparent {
+            background-color: transparent;
+        }
+
+        /* Utility - Borders */
+        .border {
+            border-width: 1px;
+            border-style: solid;
+            border-color: #e5e7eb;
+        }
+
+        .border-t-4 {
+            border-top: 4px solid;
+        }
+
+        .border-l-4 {
+            border-left: 4px solid;
+        }
+
+        .border-gray-200 {
+            border-color: #e5e7eb;
+        }
+
+        .border-gray-300 {
+            border-color: #d1d5db;
+        }
+
+        .border-gray-400 {
+            border-color: #9ca3af;
+        }
+
+        .border-gray-500 {
+            border-color: #6b7280;
+        }
+
+        .border-gray-600 {
+            border-color: #4b5563;
+        }
+
+        .border-blue-300 {
+            border-color: #93c5fd;
+        }
+
+        .border-blue-500 {
+            border-color: #3b82f6;
+        }
+
+        .border-green-500 {
+            border-color: #22c55e;
+        }
+
+        .border-purple-500 {
+            border-color: #a855f7;
+        }
+
+        .border-orange-500 {
+            border-color: #f97316;
+        }
+
+        .border-dashed {
+            border-style: dashed;
+        }
+
+        .border-0 {
+            border-width: 0;
+        }
+
+        .rounded {
+            border-radius: 0.25rem;
+        }
+
+        .rounded-md {
+            border-radius: 0.375rem;
+        }
+
+        .rounded-full {
+            border-radius: 9999px;
+        }
+
+        .rounded-sm {
+            border-radius: 0.125rem;
+        }
+
+        .divide-y>*+* {
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .divide-gray-200>*+* {
+            border-color: #e5e7eb;
+        }
+
+        /* Utility - Sizing */
+        .w-3 {
+            width: 0.75rem;
+        }
+
+        .h-3 {
+            height: 0.75rem;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .h-2\.5,
+        .h-2-5 {
+            height: 0.625rem;
+        }
+
+        .min-w-full {
+            min-width: 100%;
+        }
+
+        .max-w-\[1600px\] {
+            max-width: 1600px;
+        }
+
+        .max-w-\[200px\] {
+            max-width: 200px;
+        }
+
+        .max-h-\[500px\] {
+            max-height: 500px;
+        }
+
+        /* Utility - Display / Overflow */
+        .block {
+            display: block;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .overflow-hidden {
+            overflow: hidden;
+        }
+
+        .overflow-x-auto {
+            overflow-x: auto;
+        }
+
+        .relative {
+            position: relative;
+        }
+
+        .sticky {
+            position: sticky;
+        }
+
+        .top-0 {
+            top: 0;
+        }
+
+        .z-10 {
+            z-index: 10;
+        }
+
+        /* Utility - Interactions */
+        .outline-none {
+            outline: none;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .transition {
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+        }
+
+        .shadow-sm {
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        /* Hover states */
+        .hover\:bg-blue-700:hover {
+            background-color: #1d4ed8;
+        }
+
+        .hover\:bg-green-700:hover {
+            background-color: #15803d;
+        }
+
+        .hover\:bg-red-200:hover {
+            background-color: #fecaca;
+        }
+
+        .hover\:bg-gray-300:hover {
+            background-color: #d1d5db;
+        }
+
+        /* Focus states */
+        .focus\:ring-2:focus {
+            box-shadow: 0 0 0 2px;
+        }
+
+        .focus\:ring-blue-500:focus {
+            box-shadow: 0 0 0 2px #3b82f6;
+        }
+
+        .focus\:ring-green-500:focus {
+            box-shadow: 0 0 0 2px #22c55e;
+        }
+
+        /* File input pseudo-element styling */
+        input[type="file"]::file-selector-button {
+            margin-right: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            border: 0;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background-color: #16a34a;
+            color: white;
+            cursor: pointer;
+            transition: background-color 150ms;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background-color: #15803d;
+        }
+
+        /* Progress bar height helper */
+        .h-2\.5 {
+            height: 0.625rem;
+        }
+
+        /* Responsive - md (768px+) */
+        @media (min-width: 768px) {
+            .md\:flex-row {
+                flex-direction: row;
+            }
+
+            .md\:justify-between {
+                justify-content: space-between;
+            }
+
+            .md\:items-center {
+                align-items: center;
+            }
+
+            .md\:grid-cols-3 {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .md\:w-40 {
+                width: 10rem;
+            }
+
+            .md\:w-auto {
+                width: auto;
+            }
+
+            .md\:inline {
+                display: inline;
+            }
+
+            .md\:mt-0 {
+                margin-top: 0;
+            }
+
+            .hidden.md\:inline {
+                display: none;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .hidden.md\:inline {
+                display: inline;
+            }
+        }
+
+        /* Responsive - lg (1024px+) */
+        @media (min-width: 1024px) {
+            .lg\:grid-cols-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .lg\:grid-cols-12 {
+                grid-template-columns: repeat(12, minmax(0, 1fr));
+            }
+
+            .lg\:col-span-12 {
+                grid-column: span 12 / span 12;
+            }
+        }
+
+        /* Responsive - xl (1280px+) */
+        @media (min-width: 1280px) {
+            .xl\:col-span-7 {
+                grid-column: span 7 / span 7;
+            }
+
+            .xl\:col-span-5 {
+                grid-column: span 5 / span 5;
+            }
+        }
     </style>
 </head>
+
 <body class="p-6">
 
     <!-- Loading Screen -->
@@ -50,25 +781,28 @@
                 <p class="text-gray-500">รายงานยอดขายสะสมและ Pipeline</p>
             </div>
             <div class="flex items-center gap-2">
-                 <span id="statusIndicator" class="px-3 py-1 rounded-full text-xs font-bold bg-gray-200 text-gray-600">
+                <span id="statusIndicator" class="px-3 py-1 rounded-full text-xs font-bold bg-gray-200 text-gray-600">
                     รอการเชื่อมต่อข้อมูล
-                 </span>
-                 <button onclick="clearData()" class="px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-600 hover:bg-red-200 transition">
+                </span>
+                <button onclick="clearData()"
+                    class="px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-600 hover:bg-red-200 transition">
                     ล้างหน้าจอ
-                 </button>
+                </button>
             </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
             <div class="lg:col-span-12 xl:col-span-7 card border-l-4 border-blue-500">
-                <span class="block text-sm font-semibold text-gray-700 mb-4">📁 นำเข้าข้อมูล (เลือกวิธีใดวิธีหนึ่ง)</span>
-                
+                <span class="block text-sm font-semibold text-gray-700 mb-4">📁 นำเข้าข้อมูล
+                    (เลือกวิธีใดวิธีหนึ่ง)</span>
+
                 <div class="mb-4">
                     <span class="text-xs font-bold text-blue-600 mb-1 block">วิธีที่ 1: วางลิงก์ Google Sheet</span>
                     <div class="flex gap-2">
-                        <input type="text" id="sheetUrl" placeholder="วางลิงก์ที่ได้จาก Publish to web ที่นี่..." 
-                               class="flex-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm">
-                        <button onclick="loadFromUrl()" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 font-medium transition text-sm">
+                        <input type="text" id="sheetUrl" placeholder="วางลิงก์ที่ได้จาก Publish to web ที่นี่..."
+                            class="flex-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                        <button onclick="loadFromUrl()"
+                            class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 font-medium transition text-sm">
                             ดึงข้อมูล
                         </button>
                     </div>
@@ -81,10 +815,11 @@
                 </div>
 
                 <div class="mt-4">
-                    <span class="text-xs font-bold text-green-600 mb-1 block">วิธีที่ 2: อัปโหลดไฟล์ .csv จากคอมพิวเตอร์</span>
+                    <span class="text-xs font-bold text-green-600 mb-1 block">วิธีที่ 2: อัปโหลดไฟล์ .csv
+                        จากคอมพิวเตอร์</span>
                     <div class="flex gap-2 items-center">
-                        <input type="file" id="csvFileInput" accept=".csv" 
-                               class="flex-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 outline-none text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-600 file:text-white hover:file:bg-green-700 cursor-pointer">
+                        <input type="file" id="csvFileInput" accept=".csv"
+                            class="flex-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 outline-none text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-600 file:text-white hover:file:bg-green-700 cursor-pointer">
                     </div>
                 </div>
             </div>
@@ -93,45 +828,57 @@
                 <div class="flex justify-between items-start mb-2">
                     <span class="block text-sm font-semibold text-gray-700">🔍 ตัวเลือกการแสดงผล</span>
                     <div class="text-xs text-gray-500 flex gap-3 border px-2 py-1 rounded bg-gray-50">
-                        <span class="flex items-center gap-1"><div class="w-3 h-3 bg-gray-600 rounded-sm"></div> Won</span>
-                        <span class="flex items-center gap-1"><div class="w-3 h-3 bg-red-500 rounded-sm"></div> Lost</span>
-                        <span class="flex items-center gap-1"><div class="w-3 h-3 border border-dashed border-gray-600 rounded-sm bg-transparent"></div> Open</span>
+                        <span class="flex items-center gap-1">
+                            <div class="w-3 h-3 bg-gray-600 rounded-sm"></div> Won
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <div class="w-3 h-3 bg-red-500 rounded-sm"></div> Lost
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <div class="w-3 h-3 border border-dashed border-gray-600 rounded-sm bg-transparent"></div>
+                            Open
+                        </span>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div class="col-span-2">
                         <label for="viewMode" class="text-xs text-gray-500">มุมมอง (View)</label>
-                        <select id="viewMode" onchange="handleViewChange()" class="w-full p-2 border border-blue-300 bg-blue-50 rounded text-sm font-semibold text-blue-900">
+                        <select id="viewMode" onchange="handleViewChange()"
+                            class="w-full p-2 border border-blue-300 bg-blue-50 rounded text-sm font-semibold text-blue-900">
                             <option value="bySale">รายบุคคล (By Salesperson)</option>
                             <option value="byGroup">รายกลุ่ม (By Sale Group)</option>
                         </select>
                     </div>
                     <div id="groupFilterContainer">
                         <label for="groupFilter" class="text-xs text-gray-500">กลุ่ม (Group)</label>
-                        <select id="groupFilter" onchange="updateSalesDropdown()" class="w-full p-2 border border-gray-300 rounded text-sm">
+                        <select id="groupFilter" onchange="updateSalesDropdown()"
+                            class="w-full p-2 border border-gray-300 rounded text-sm">
                             <option value="all">ทุกกลุ่ม (All)</option>
                         </select>
                     </div>
                     <div id="salesFilterContainer">
                         <label for="salesFilter" class="text-xs text-gray-500">พนักงาน (Sale)</label>
-                        <select id="salesFilter" onchange="updateDashboard()" class="w-full p-2 border border-gray-300 rounded text-sm">
+                        <select id="salesFilter" onchange="updateDashboard()"
+                            class="w-full p-2 border border-gray-300 rounded text-sm">
                             <option value="all">ทั้งหมด (All)</option>
                         </select>
                     </div>
                     <div class="col-span-1">
                         <label for="startMonth" class="text-xs text-gray-500">ตั้งแต่</label>
-                        <input type="month" id="startMonth" onchange="updateDashboard()" class="w-full p-2 border border-gray-300 rounded text-sm">
+                        <input type="month" id="startMonth" onchange="updateDashboard()"
+                            class="w-full p-2 border border-gray-300 rounded text-sm">
                     </div>
                     <div class="col-span-1">
                         <label for="endMonth" class="text-xs text-gray-500">ถึง</label>
-                        <input type="month" id="endMonth" onchange="updateDashboard()" class="w-full p-2 border border-gray-300 rounded text-sm">
+                        <input type="month" id="endMonth" onchange="updateDashboard()"
+                            class="w-full p-2 border border-gray-300 rounded text-sm">
                     </div>
                 </div>
             </div>
         </div>
 
         <div id="dashboardContent" class="hidden">
-            
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="card border-t-4 border-blue-500 bg-blue-50">
                     <div class="flex justify-between items-center mb-4">
@@ -208,7 +955,8 @@
             </div>
 
             <div class="card mb-8 border-t-4 border-orange-500">
-                <h3 class="font-bold text-gray-700 mb-4" id="titleMonthly">📅 แนวโน้มยอดขายสะสมรายเดือน (Cumulative Trend)</h3>
+                <h3 class="font-bold text-gray-700 mb-4" id="titleMonthly">📅 แนวโน้มยอดขายสะสมรายเดือน (Cumulative
+                    Trend)</h3>
                 <div class="chart-container">
                     <canvas id="chartMonthly"></canvas>
                 </div>
@@ -220,15 +968,20 @@
                 </div>
 
                 <!-- Custom Search 3 Criteria (AND) -->
-                <div class="mb-4 bg-gray-50 p-4 rounded border border-gray-200 flex flex-wrap items-center gap-3 shadow-sm">
+                <div
+                    class="mb-4 bg-gray-50 p-4 rounded border border-gray-200 flex flex-wrap items-center gap-3 shadow-sm">
                     <span class="text-sm font-bold text-gray-700">🔍 ค้นหา (AND):</span>
-                    <input type="text" id="customSearch1" placeholder="คำค้นหาที่ 1..." class="p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none w-full md:w-40 transition">
+                    <input type="text" id="customSearch1" placeholder="คำค้นหาที่ 1..."
+                        class="p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none w-full md:w-40 transition">
                     <span class="text-gray-400 font-bold hidden md:inline">+</span>
-                    <input type="text" id="customSearch2" placeholder="คำค้นหาที่ 2..." class="p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none w-full md:w-40 transition">
+                    <input type="text" id="customSearch2" placeholder="คำค้นหาที่ 2..."
+                        class="p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none w-full md:w-40 transition">
                     <span class="text-gray-400 font-bold hidden md:inline">+</span>
-                    <input type="text" id="customSearch3" placeholder="คำค้นหาที่ 3..." class="p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none w-full md:w-40 transition">
-                    
-                    <button onclick="clearCustomSearch()" class="px-4 py-2 bg-gray-200 text-gray-700 font-semibold text-sm rounded hover:bg-gray-300 transition w-full md:w-auto mt-2 md:mt-0">
+                    <input type="text" id="customSearch3" placeholder="คำค้นหาที่ 3..."
+                        class="p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none w-full md:w-40 transition">
+
+                    <button onclick="clearCustomSearch()"
+                        class="px-4 py-2 bg-gray-200 text-gray-700 font-semibold text-sm rounded hover:bg-gray-300 transition w-full md:w-auto mt-2 md:mt-0">
                         ล้างคำค้นหา
                     </button>
                 </div>
@@ -258,7 +1011,7 @@
         let transactions = [];
         let targets = {};
         let groups = new Set();
-        
+
         let chartTotalInstance = null;
         let chartRenewInstance = null;
         let chartNewInstance = null;
@@ -270,9 +1023,9 @@
 
         // --- Custom DataTables Filter (3 Criteria Search - AND) ---
         $.fn.dataTable.ext.search.push(
-            function(settings, data, dataIndex) {
+            function (settings, data, dataIndex) {
                 if (settings.nTable.id !== 'TableDataList') {
-                    return true; 
+                    return true;
                 }
 
                 const term1 = ($('#customSearch1').val() || "").toLowerCase().trim();
@@ -294,9 +1047,9 @@
             }
         );
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             // เมื่อพิมพ์ค้นหา ให้สั่ง Table อัปเดตทันที
-            $('#customSearch1, #customSearch2, #customSearch3').on('input', function() {
+            $('#customSearch1, #customSearch2, #customSearch3').on('input', function () {
                 if (dataTableInstance) {
                     dataTableInstance.draw();
                 }
@@ -329,7 +1082,7 @@
             document.getElementById('dashboardContent').classList.add('hidden');
             document.getElementById('sheetUrl').value = '';
             document.getElementById('csvFileInput').value = '';
-            clearCustomSearch(); 
+            clearCustomSearch();
             if (dataTableInstance) { dataTableInstance.clear().draw(); }
             updateStatus('success', 'ล้างข้อมูลเสร็จสิ้น');
         }
@@ -337,21 +1090,21 @@
         function reinitDataTable(dataSet) {
             if (dataTableInstance) {
                 dataTableInstance.destroy();
-                $('#tableBody').empty(); 
+                $('#tableBody').empty();
             }
-            
+
             dataTableInstance = $('#TableDataList').DataTable({
                 data: dataSet,
-                deferRender: true, 
+                deferRender: true,
                 paging: true,
                 pageLength: 100,
-                dom: 'lrtip', 
+                dom: 'lrtip',
                 order: [[0, "desc"]],
                 columns: [
                     { data: 0 },
-                    { data: 1, render: function(data){ return `<span class="font-bold text-gray-800">${data}</span>`; } },
+                    { data: 1, render: function (data) { return `<span class="font-bold text-gray-800">${data}</span>`; } },
                     { data: 2 },
-                    { data: 3, render: function(data){ return `<div class="truncate max-w-[200px]" title="${data}">${data}</div>`; } },
+                    { data: 3, render: function (data) { return `<div class="truncate max-w-[200px]" title="${data}">${data}</div>`; } },
                     { data: 4, className: "text-center" },
                     { data: 5, className: "text-center" },
                     { data: 6, className: "text-right font-medium text-gray-800" }
@@ -360,9 +1113,9 @@
         }
 
         function handleParseResult(results) {
-            if(results.data && results.data.length > 0) {
+            if (results.data && results.data.length > 0) {
                 setTimeout(() => {
-                    if(processData(results.data)) {
+                    if (processData(results.data)) {
                         updateStatus('success', 'เชื่อมต่อข้อมูลสำเร็จ');
                         document.getElementById('dashboardContent').classList.remove('hidden');
                     } else {
@@ -378,41 +1131,40 @@
 
         function loadFromUrl() {
             const url = document.getElementById('sheetUrl').value.trim();
-            if(!url) { alert("กรุณาวางลิงก์ Google Sheet ก่อนค่ะ"); return; }
+            if (!url) { alert("กรุณาวางลิงก์ Google Sheet ก่อนค่ะ"); return; }
             showLoading(true);
             updateStatus('loading', 'กำลังดึงข้อมูลจากลิงก์...');
             Papa.parse(url, {
-                download: true, 
-                header: false, 
+                download: true,
+                header: false,
                 skipEmptyLines: true,
-                worker: true, 
-                complete: function(results) { handleParseResult(results); },
-                error: function(err) { updateStatus('error', 'ดึงข้อมูลล้มเหลว ตรวจสอบลิงก์อีกครั้ง'); showLoading(false); }
+                worker: true,
+                complete: function (results) { handleParseResult(results); },
+                error: function (err) { updateStatus('error', 'ดึงข้อมูลล้มเหลว ตรวจสอบลิงก์อีกครั้ง'); showLoading(false); }
             });
         }
 
-        document.getElementById('csvFileInput').addEventListener('change', function(e) {
+        document.getElementById('csvFileInput').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (!file) return;
             showLoading(true);
             updateStatus('loading', 'กำลังอ่านไฟล์...');
-            
+
             Papa.parse(file, {
-                header: false, 
+                header: false,
                 skipEmptyLines: true,
-                worker: true, 
-                complete: function(results) { handleParseResult(results); },
-                error: function(err) { updateStatus('error', 'การอ่านไฟล์ล้มเหลว'); showLoading(false); }
+                worker: true,
+                complete: function (results) { handleParseResult(results); },
+                error: function (err) { updateStatus('error', 'การอ่านไฟล์ล้มเหลว'); showLoading(false); }
             });
         });
 
         function updateStatus(type, text) {
             const el = document.getElementById('statusIndicator');
             el.innerText = text;
-            el.className = `px-3 py-1 rounded-full text-xs font-bold ${
-                type === 'success' ? 'bg-green-100 text-green-700' :
+            el.className = `px-3 py-1 rounded-full text-xs font-bold ${type === 'success' ? 'bg-green-100 text-green-700' :
                 type === 'loading' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
-            }`;
+                }`;
         }
 
         function cleanNum(val) {
@@ -425,28 +1177,28 @@
         }
 
         function normalizeDate(str) {
-            if(!str) return "";
+            if (!str) return "";
             str = str.trim();
             if (str === '(blank)' || str === '') return "";
-            
+
             if (!isNaN(str) && Number(str) > 30000 && Number(str) < 60000) {
                 const dateObj = new Date(Math.round((Number(str) - 25569) * 86400 * 1000));
                 return dateObj.toISOString().split('T')[0];
             }
 
-            if(str.match(/^\d{1,2}[-/]\d{1,2}[-/]\d{2,4}$/)) {
+            if (str.match(/^\d{1,2}[-/]\d{1,2}[-/]\d{2,4}$/)) {
                 const separator = str.includes('-') ? '-' : '/';
                 const parts = str.split(separator);
-                if(parts.length === 3) {
+                if (parts.length === 3) {
                     let d = parts[0].padStart(2, '0');
                     let m = parts[1].padStart(2, '0');
                     let y = parts[2];
-                    if(y.length === 2) y = "20" + y; 
+                    if (y.length === 2) y = "20" + y;
                     return `${y}-${m}-${d}`;
                 }
             }
-            if(str.match(/^\d{4}-\d{2}-\d{2}$/)) return str;
-            return str; 
+            if (str.match(/^\d{4}-\d{2}-\d{2}$/)) return str;
+            return str;
         }
 
         function processData(rows) {
@@ -463,11 +1215,11 @@
 
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
-                if (!row || row.length === 0 || !row[0]) continue; 
+                if (!row || row.length === 0 || !row[0]) continue;
 
                 if (row[0].toString().toLowerCase().includes('sales')) {
                     const cleanRow = row.map(c => (c || "").toString().toLowerCase().trim().replace(/^\ufeff/, ''));
-                    
+
                     if (cleanRow.some(c => c.includes('target'))) {
                         isTargetSection = true;
                         isTransactionSection = false;
@@ -477,7 +1229,7 @@
                         tIdx.newTarget = cleanRow.findIndex(c => c.includes('new') && !c.includes('renew') && c.includes('target'));
                         continue;
                     }
-                    
+
                     if (cleanRow.includes('date') && cleanRow.includes('amount')) {
                         isTargetSection = false;
                         isTransactionSection = true;
@@ -503,13 +1255,13 @@
                         targets[cleanName] = { group: group, renew: tRenew, new: tNew };
                         if (group && group !== "Other") groups.add(group);
                     }
-                } 
+                }
                 else if (isTransactionSection && transIdx.sales !== -1) {
                     const name = row[transIdx.sales];
                     if (name) {
                         const cleanName = name.toString().trim();
                         const amountRaw = row[transIdx.amount];
-                        
+
                         if (amountRaw !== undefined && amountRaw !== '') {
                             let statusStr = transIdx.status !== -1 ? (row[transIdx.status] || "").toString().toLowerCase() : 'won';
                             let finalStatus = 'won';
@@ -537,10 +1289,10 @@
             }
 
             initFilters();
-            if(transactions.length > 0) {
+            if (transactions.length > 0) {
                 const months = transactions.map(t => t.date.substring(0, 7)).filter(d => d.length === 7);
                 const distinctMonths = [...new Set(months)].sort();
-                if(distinctMonths.length > 0) {
+                if (distinctMonths.length > 0) {
                     document.getElementById('startMonth').value = distinctMonths[0];
                     document.getElementById('endMonth').value = distinctMonths[distinctMonths.length - 1];
                 }
@@ -571,7 +1323,7 @@
 
         function updateDashboard() {
             showLoading(true);
-            
+
             setTimeout(() => {
                 const viewMode = document.getElementById('viewMode').value;
                 const selGroup = document.getElementById('groupFilter').value;
@@ -587,17 +1339,17 @@
                 document.getElementById('kpiNewTargetLabel').innerHTML = `${labelStr}<b id="kpiNewTarget">0</b>`;
 
                 const filtered = [];
-                for(let i=0; i<transactions.length; i++) {
+                for (let i = 0; i < transactions.length; i++) {
                     const t = transactions[i];
-                    if(!t.date && isMonthFiltered) continue; 
-                    if(isMonthFiltered) {
+                    if (!t.date && isMonthFiltered) continue;
+                    if (isMonthFiltered) {
                         const d = t.date.substring(0, 7);
-                        if(d < sMonth || d > eMonth) continue;
+                        if (d < sMonth || d > eMonth) continue;
                     }
                     const tGroup = targets[t.sales] ? targets[t.sales].group : "Other";
-                    if(selGroup !== 'all' && tGroup !== selGroup) continue;
-                    if(selSale !== 'all' && t.sales !== selSale) continue;
-                    
+                    if (selGroup !== 'all' && tGroup !== selGroup) continue;
+                    if (selSale !== 'all' && t.sales !== selSale) continue;
+
                     filtered.push(t);
                 }
 
@@ -608,104 +1360,104 @@
                     while (curr <= end) { displayMonths.push(curr.toISOString().slice(0, 7)); curr.setMonth(curr.getMonth() + 1); }
                 } else {
                     const uniqueMonths = new Set();
-                    filtered.forEach(t => { if(t.date.length >= 7) uniqueMonths.add(t.date.substring(0,7)); });
+                    filtered.forEach(t => { if (t.date.length >= 7) uniqueMonths.add(t.date.substring(0, 7)); });
                     displayMonths = [...uniqueMonths].sort();
-                    if(displayMonths.length === 0) displayMonths = [new Date().toISOString().slice(0,7)];
+                    if (displayMonths.length === 0) displayMonths = [new Date().toISOString().slice(0, 7)];
                 }
 
                 let actRenewWon = 0, actNewWon = 0;
                 let tarRenew = 0, tarNew = 0;
-                const chartData = {}; 
+                const chartData = {};
                 const monthlyWon = {}, monthlyCommit = {}, monthlyUpside = {}, monthlyLost = {}, monthlyOpen = {};
 
                 if (viewMode === 'byGroup') {
                     const relevantGroups = selGroup === 'all' ? [...groups] : [selGroup];
                     relevantGroups.forEach(g => chartData[g] = { renewWon: 0, renewCommit: 0, renewUpside: 0, renewOpen: 0, renewLost: 0, newWon: 0, newCommit: 0, newUpside: 0, newOpen: 0, newLost: 0, tRenew: 0, tNew: 0 });
-                    
+
                     Object.keys(targets).forEach(name => {
                         const g = targets[name].group;
                         if (chartData[g]) {
                             chartData[g].tRenew += targets[name].renew;
                             chartData[g].tNew += targets[name].new;
-                            if(selGroup === 'all' || selGroup === g) { 
-                                tarRenew += targets[name].renew; 
-                                tarNew += targets[name].new; 
+                            if (selGroup === 'all' || selGroup === g) {
+                                tarRenew += targets[name].renew;
+                                tarNew += targets[name].new;
                             }
                         }
                     });
 
                     filtered.forEach(t => {
                         const g = targets[t.sales] ? targets[t.sales].group : "Other";
-                        if(!chartData[g] && selGroup === 'all') chartData[g] = { renewWon: 0, renewCommit: 0, renewUpside: 0, renewOpen: 0, renewLost: 0, newWon: 0, newCommit: 0, newUpside: 0, newOpen: 0, newLost: 0, tRenew: 0, tNew: 0 };
-                        if(chartData[g]) {
+                        if (!chartData[g] && selGroup === 'all') chartData[g] = { renewWon: 0, renewCommit: 0, renewUpside: 0, renewOpen: 0, renewLost: 0, newWon: 0, newCommit: 0, newUpside: 0, newOpen: 0, newLost: 0, tRenew: 0, tNew: 0 };
+                        if (chartData[g]) {
                             const isRenew = t.type.toLowerCase().includes('renew');
                             const statusKey = t.status.charAt(0).toUpperCase() + t.status.slice(1);
                             const fullKey = (isRenew ? 'renew' : 'new') + statusKey;
-                            
+
                             chartData[g][fullKey] += t.amount;
-                            if(t.status === 'won') {
-                                if(isRenew) actRenewWon += t.amount; else actNewWon += t.amount;
+                            if (t.status === 'won') {
+                                if (isRenew) actRenewWon += t.amount; else actNewWon += t.amount;
                             }
                         }
                     });
                 } else {
                     if (selSale === 'all') {
                         Object.keys(targets).forEach(name => {
-                            if(selGroup === 'all' || targets[name].group === selGroup) {
+                            if (selGroup === 'all' || targets[name].group === selGroup) {
                                 chartData[name] = { renewWon: 0, renewCommit: 0, renewUpside: 0, renewOpen: 0, renewLost: 0, newWon: 0, newCommit: 0, newUpside: 0, newOpen: 0, newLost: 0, tRenew: targets[name].renew, tNew: targets[name].new };
                                 tarRenew += targets[name].renew; tarNew += targets[name].new;
                             }
                         });
                         filtered.forEach(t => {
                             const tGroup = targets[t.sales] ? targets[t.sales].group : "Other";
-                            if((selGroup === 'all' || tGroup === selGroup)) {
-                                if(!chartData[t.sales]) chartData[t.sales] = { renewWon: 0, renewCommit: 0, renewUpside: 0, renewOpen: 0, renewLost: 0, newWon: 0, newCommit: 0, newUpside: 0, newOpen: 0, newLost: 0, tRenew: 0, tNew: 0 };
-                                
+                            if ((selGroup === 'all' || tGroup === selGroup)) {
+                                if (!chartData[t.sales]) chartData[t.sales] = { renewWon: 0, renewCommit: 0, renewUpside: 0, renewOpen: 0, renewLost: 0, newWon: 0, newCommit: 0, newUpside: 0, newOpen: 0, newLost: 0, tRenew: 0, tNew: 0 };
+
                                 const isRenew = t.type.toLowerCase().includes('renew');
                                 const statusKey = t.status.charAt(0).toUpperCase() + t.status.slice(1);
                                 const fullKey = (isRenew ? 'renew' : 'new') + statusKey;
-                                
+
                                 chartData[t.sales][fullKey] += t.amount;
-                                if(t.status === 'won') {
-                                    if(isRenew) actRenewWon += t.amount; else actNewWon += t.amount;
+                                if (t.status === 'won') {
+                                    if (isRenew) actRenewWon += t.amount; else actNewWon += t.amount;
                                 }
                             }
                         });
                     } else {
-                        if(targets[selSale]) { 
-                            tarRenew = targets[selSale].renew; 
-                            tarNew = targets[selSale].new; 
+                        if (targets[selSale]) {
+                            tarRenew = targets[selSale].renew;
+                            tarNew = targets[selSale].new;
                         }
                         filtered.forEach(t => {
-                            if(!chartData[t.cust]) chartData[t.cust] = { renewWon: 0, renewCommit: 0, renewUpside: 0, renewOpen: 0, renewLost: 0, newWon: 0, newCommit: 0, newUpside: 0, newOpen: 0, newLost: 0, tRenew: 0, tNew: 0 };
-                            
+                            if (!chartData[t.cust]) chartData[t.cust] = { renewWon: 0, renewCommit: 0, renewUpside: 0, renewOpen: 0, renewLost: 0, newWon: 0, newCommit: 0, newUpside: 0, newOpen: 0, newLost: 0, tRenew: 0, tNew: 0 };
+
                             const isRenew = t.type.toLowerCase().includes('renew');
                             const statusKey = t.status.charAt(0).toUpperCase() + t.status.slice(1);
                             const fullKey = (isRenew ? 'renew' : 'new') + statusKey;
-                            
+
                             chartData[t.cust][fullKey] += t.amount;
-                            if(t.status === 'won') {
-                                if(isRenew) actRenewWon += t.amount; else actNewWon += t.amount;
+                            if (t.status === 'won') {
+                                if (isRenew) actRenewWon += t.amount; else actNewWon += t.amount;
                             }
                         });
                     }
                 }
 
                 filtered.forEach(t => {
-                    if(!t.date) return;
+                    if (!t.date) return;
                     const ym = t.date.substring(0, 7);
                     if (!monthlyWon[ym]) { monthlyWon[ym] = 0; monthlyCommit[ym] = 0; monthlyUpside[ym] = 0; monthlyLost[ym] = 0; monthlyOpen[ym] = 0; }
-                    
-                    if(t.status === 'won') monthlyWon[ym] += t.amount;
-                    else if(t.status === 'commit') monthlyCommit[ym] += t.amount;
-                    else if(t.status === 'upside') monthlyUpside[ym] += t.amount;
-                    else if(t.status === 'lost') monthlyLost[ym] += t.amount;
-                    else if(t.status === 'open') monthlyOpen[ym] += t.amount;
+
+                    if (t.status === 'won') monthlyWon[ym] += t.amount;
+                    else if (t.status === 'commit') monthlyCommit[ym] += t.amount;
+                    else if (t.status === 'upside') monthlyUpside[ym] += t.amount;
+                    else if (t.status === 'lost') monthlyLost[ym] += t.amount;
+                    else if (t.status === 'open') monthlyOpen[ym] += t.amount;
                 });
 
                 let runningWon = 0, runningCommit = 0, runningUpside = 0, runningLost = 0, runningOpen = 0;
                 const cumWon = [], cumCommitFloat = [], cumUpsideFloat = [], cumLostFloat = [], cumOpenFloat = [], cumTargets = [];
-                
+
                 const totalAnnualTarget = Object.keys(targets).reduce((acc, name) => {
                     if (selGroup === 'all' || targets[name].group === selGroup) {
                         if (selSale === 'all' || selSale === name) { return acc + targets[name].renew + targets[name].new; }
@@ -719,19 +1471,19 @@
                     runningUpside += (monthlyUpside[m] || 0);
                     runningLost += (monthlyLost[m] || 0);
                     runningOpen += (monthlyOpen[m] || 0);
-                    
+
                     cumWon.push(runningWon);
                     cumCommitFloat.push([runningWon, runningWon + runningCommit]);
                     cumUpsideFloat.push([runningWon + runningCommit, runningWon + runningCommit + runningUpside]);
                     cumOpenFloat.push([runningWon + runningCommit + runningUpside, runningWon + runningCommit + runningUpside + runningOpen]);
                     cumLostFloat.push([runningWon + runningCommit + runningUpside + runningOpen, runningWon + runningCommit + runningUpside + runningOpen + runningLost]);
-                    
-                    cumTargets.push((totalAnnualTarget / 12) * (idx + 1)); 
+
+                    cumTargets.push((totalAnnualTarget / 12) * (idx + 1));
                 });
 
                 let actTotalWon = actRenewWon + actNewWon;
                 let tarTotal = tarRenew + tarNew;
-                
+
                 const pctTotal = tarTotal > 0 ? (actTotalWon / tarTotal) * 100 : 0;
                 document.getElementById('kpiTotalActual').innerText = formatter.format(actTotalWon);
                 document.getElementById('kpiTotalTarget').innerText = numFormat.format(tarTotal);
@@ -751,16 +1503,16 @@
                 document.getElementById('progNew').style.width = Math.min(pctN, 100) + '%';
 
                 const isCustomerView = (viewMode === 'bySale' && selSale !== 'all');
-                
+
                 updateTotalChart('chartTotal', chartData, !isCustomerView);
-                updateStatusChart('chartRenew', chartData, 'renew', 'rgba(34, 197, 94, 0.8)', 'rgba(34, 197, 94, 1)', !isCustomerView); 
+                updateStatusChart('chartRenew', chartData, 'renew', 'rgba(34, 197, 94, 0.8)', 'rgba(34, 197, 94, 1)', !isCustomerView);
                 updateStatusChart('chartNew', chartData, 'new', 'rgba(147, 51, 234, 0.8)', 'rgba(147, 51, 234, 1)', !isCustomerView);
                 updateMonthlyChart('chartMonthly', displayMonths, cumWon, cumCommitFloat, cumUpsideFloat, cumOpenFloat, cumLostFloat, cumTargets);
 
                 const tableData = filtered.map(t => {
                     const groupName = targets[t.sales] ? targets[t.sales].group : "-";
                     const isRenew = t.type.toLowerCase().includes('renew');
-                    
+
                     let statusBadge = '';
                     if (t.status === 'won') statusBadge = '<span class="px-2 py-1 rounded text-xs font-bold bg-blue-100 text-blue-700">Won</span>';
                     else if (t.status === 'commit') statusBadge = '<span class="px-2 py-1 rounded text-xs font-bold bg-indigo-100 text-indigo-700">Commit</span>';
@@ -789,22 +1541,22 @@
 
         function tooltipCallback(c) {
             let val = c.raw;
-            if(Array.isArray(val)) val = val[1] - val[0]; 
+            if (Array.isArray(val)) val = val[1] - val[0];
             return `${c.dataset.label}: ${numFormat.format(val)}`;
         }
 
         function updateTotalChart(canvasId, dataMap, showTarget) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             let labels = Object.keys(dataMap).filter(k => (dataMap[k].renewWon + dataMap[k].renewCommit + dataMap[k].renewUpside + dataMap[k].renewOpen + dataMap[k].renewLost + dataMap[k].newWon + dataMap[k].newCommit + dataMap[k].newUpside + dataMap[k].newOpen + dataMap[k].newLost) > 0 || (showTarget && (dataMap[k].tRenew + dataMap[k].tNew) > 0));
-            
-            labels.sort((a,b) => {
-                if(showTarget) return (dataMap[b].tRenew + dataMap[b].tNew) - (dataMap[a].tRenew + dataMap[a].tNew); 
+
+            labels.sort((a, b) => {
+                if (showTarget) return (dataMap[b].tRenew + dataMap[b].tNew) - (dataMap[a].tRenew + dataMap[a].tNew);
                 const aTotal = dataMap[a].renewWon + dataMap[a].renewCommit + dataMap[a].renewUpside + dataMap[a].renewOpen + dataMap[a].renewLost + dataMap[a].newWon + dataMap[a].newCommit + dataMap[a].newUpside + dataMap[a].newOpen + dataMap[a].newLost;
                 const bTotal = dataMap[b].renewWon + dataMap[b].renewCommit + dataMap[b].renewUpside + dataMap[b].renewOpen + dataMap[b].renewLost + dataMap[b].newWon + dataMap[b].newCommit + dataMap[b].newUpside + dataMap[b].newOpen + dataMap[b].newLost;
-                return bTotal - aTotal; 
+                return bTotal - aTotal;
             });
             labels = labels.slice(0, 10);
-            
+
             const dataWon = labels.map(k => dataMap[k].renewWon + dataMap[k].newWon);
             const dataCommit = labels.map(k => {
                 const w = dataMap[k].renewWon + dataMap[k].newWon;
@@ -822,7 +1574,7 @@
                 const c = dataMap[k].renewCommit + dataMap[k].newCommit;
                 const u = dataMap[k].renewUpside + dataMap[k].newUpside;
                 const o = dataMap[k].renewOpen + dataMap[k].newOpen;
-                return [w + c + u, w + c + u + o]; 
+                return [w + c + u, w + c + u + o];
             });
             const dataLost = labels.map(k => {
                 const w = dataMap[k].renewWon + dataMap[k].newWon;
@@ -848,7 +1600,7 @@
                     datasets: [
                         {
                             label: 'เป้าหมายรวม', data: displayTargets,
-                            backgroundColor: 'transparent', borderColor: colorBase, borderWidth: 2, borderSkipped: false,           
+                            backgroundColor: 'transparent', borderColor: colorBase, borderWidth: 2, borderSkipped: false,
                             barThickness: 40, order: 5, datalabels: { display: false }
                         },
                         {
@@ -856,8 +1608,8 @@
                             backgroundColor: 'rgba(239, 68, 68, 1)', borderColor: colorBase,
                             borderWidth: (context) => { const val = context.raw; return (val && val[1] > val[0]) ? 2 : 0; },
                             barThickness: 24, order: 4, borderSkipped: false,
-                            datalabels: { 
-                                display: function(context) { 
+                            datalabels: {
+                                display: function (context) {
                                     const lostAmt = context.dataset.data[context.dataIndex][1] - context.dataset.data[context.dataIndex][0];
                                     return lostAmt > 0;
                                 },
@@ -869,25 +1621,25 @@
                                     const openAmt = dataOpen[ctx.dataIndex][1] - dataOpen[ctx.dataIndex][0];
                                     const lostAmt = val[1] - val[0];
                                     let text = numFormat.format(wonAmt);
-                                    if(showTarget) {
+                                    if (showTarget) {
                                         const target = targetsData[ctx.dataIndex];
-                                        if(target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
+                                        if (target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
                                     }
-                                    if(commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
-                                    if(upsideAmt > 0) text += ` + {Up ${numFormat.format(upsideAmt)}}`;
-                                    if(openAmt > 0) text += ` + {Open ${numFormat.format(openAmt)}}`;
-                                    if(lostAmt > 0) text += ` + {Lost ${numFormat.format(lostAmt)}}`;
+                                    if (commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
+                                    if (upsideAmt > 0) text += ` + {Up ${numFormat.format(upsideAmt)}}`;
+                                    if (openAmt > 0) text += ` + {Open ${numFormat.format(openAmt)}}`;
+                                    if (lostAmt > 0) text += ` + {Lost ${numFormat.format(lostAmt)}}`;
                                     return text;
                                 }
                             }
                         },
                         {
                             label: 'ยอด Open', data: dataOpen,
-                            backgroundColor: 'transparent', borderColor: colorBase, borderDash: [5, 5], 
-                            borderWidth: (context) => { const val = context.raw; return (val && val[1] > val[0]) ? 2 : 0; }, 
+                            backgroundColor: 'transparent', borderColor: colorBase, borderDash: [5, 5],
+                            borderWidth: (context) => { const val = context.raw; return (val && val[1] > val[0]) ? 2 : 0; },
                             barThickness: 24, order: 3, borderSkipped: false,
-                            datalabels: { 
-                                display: function(context) { 
+                            datalabels: {
+                                display: function (context) {
                                     const openAmt = context.dataset.data[context.dataIndex][1] - context.dataset.data[context.dataIndex][0];
                                     const lostAmt = dataLost[context.dataIndex][1] - dataLost[context.dataIndex][0];
                                     return openAmt > 0 && lostAmt === 0;
@@ -899,22 +1651,22 @@
                                     const upsideAmt = dataUpside[ctx.dataIndex][1] - dataUpside[ctx.dataIndex][0];
                                     const openAmt = val[1] - val[0];
                                     let text = numFormat.format(wonAmt);
-                                    if(showTarget) {
+                                    if (showTarget) {
                                         const target = targetsData[ctx.dataIndex];
-                                        if(target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
+                                        if (target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
                                     }
-                                    if(commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
-                                    if(upsideAmt > 0) text += ` + {Up ${numFormat.format(upsideAmt)}}`;
-                                    if(openAmt > 0) text += ` + {Open ${numFormat.format(openAmt)}}`;
+                                    if (commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
+                                    if (upsideAmt > 0) text += ` + {Up ${numFormat.format(upsideAmt)}}`;
+                                    if (openAmt > 0) text += ` + {Open ${numFormat.format(openAmt)}}`;
                                     return text;
                                 }
                             }
                         },
                         {
                             label: 'ยอด Upside', data: dataUpside,
-                            backgroundColor: colorUpside, borderWidth: 0, barThickness: 24, order: 2, 
-                            datalabels: { 
-                                display: function(context) { 
+                            backgroundColor: colorUpside, borderWidth: 0, barThickness: 24, order: 2,
+                            datalabels: {
+                                display: function (context) {
                                     const upsideAmt = context.dataset.data[context.dataIndex][1] - context.dataset.data[context.dataIndex][0];
                                     const openAmt = dataOpen[context.dataIndex][1] - dataOpen[context.dataIndex][0];
                                     const lostAmt = dataLost[context.dataIndex][1] - dataLost[context.dataIndex][0];
@@ -926,21 +1678,21 @@
                                     const commitAmt = dataCommit[ctx.dataIndex][1] - dataCommit[ctx.dataIndex][0];
                                     const upsideAmt = val[1] - val[0];
                                     let text = numFormat.format(wonAmt);
-                                    if(showTarget) {
+                                    if (showTarget) {
                                         const target = targetsData[ctx.dataIndex];
-                                        if(target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
+                                        if (target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
                                     }
-                                    if(commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
-                                    if(upsideAmt > 0) text += ` + {Up ${numFormat.format(upsideAmt)}}`;
+                                    if (commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
+                                    if (upsideAmt > 0) text += ` + {Up ${numFormat.format(upsideAmt)}}`;
                                     return text;
                                 }
                             }
                         },
                         {
                             label: 'ยอด Commit', data: dataCommit,
-                            backgroundColor: colorCommit, borderWidth: 0, barThickness: 24, order: 1, 
-                            datalabels: { 
-                                display: function(context) { 
+                            backgroundColor: colorCommit, borderWidth: 0, barThickness: 24, order: 1,
+                            datalabels: {
+                                display: function (context) {
                                     const commitAmt = context.dataset.data[context.dataIndex][1] - context.dataset.data[context.dataIndex][0];
                                     const upsideAmt = dataUpside[context.dataIndex][1] - dataUpside[context.dataIndex][0];
                                     const openAmt = dataOpen[context.dataIndex][1] - dataOpen[context.dataIndex][0];
@@ -952,20 +1704,20 @@
                                     const wonAmt = dataWon[ctx.dataIndex];
                                     const commitAmt = val[1] - val[0];
                                     let text = numFormat.format(wonAmt);
-                                    if(showTarget) {
+                                    if (showTarget) {
                                         const target = targetsData[ctx.dataIndex];
-                                        if(target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
+                                        if (target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
                                     }
-                                    if(commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
+                                    if (commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
                                     return text;
                                 }
                             }
                         },
                         {
                             label: 'ยอด Won', data: dataWon,
-                            backgroundColor: colorBase, borderWidth: 0, barThickness: 24, order: 0, 
-                            datalabels: { 
-                                display: function(context) { 
+                            backgroundColor: colorBase, borderWidth: 0, barThickness: 24, order: 0,
+                            datalabels: {
+                                display: function (context) {
                                     const wonAmt = context.dataset.data[context.dataIndex];
                                     const commitAmt = dataCommit[context.dataIndex][1] - dataCommit[context.dataIndex][0];
                                     const upsideAmt = dataUpside[context.dataIndex][1] - dataUpside[context.dataIndex][0];
@@ -977,9 +1729,9 @@
                                 formatter: (val, ctx) => {
                                     const wonAmt = val;
                                     let text = numFormat.format(wonAmt);
-                                    if(showTarget) {
+                                    if (showTarget) {
                                         const target = targetsData[ctx.dataIndex];
-                                        if(target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
+                                        if (target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
                                     }
                                     return text;
                                 }
@@ -991,7 +1743,7 @@
                     responsive: true, maintainAspectRatio: false, indexAxis: 'y',
                     scales: { x: { beginAtZero: true, grid: { display: false } }, y: { grid: { display: false }, stacked: true } },
                     plugins: { legend: { display: false }, tooltip: { callbacks: { label: tooltipCallback } } },
-                    layout: { padding: { right: 220, top: 20 } } 
+                    layout: { padding: { right: 220, top: 20 } }
                 }
             });
         }
@@ -999,48 +1751,48 @@
         function updateStatusChart(canvasId, dataMap, type, colorSolid, colorBorder, showTarget) {
             const ctx = document.getElementById(canvasId).getContext('2d');
             const targetKey = type === 'renew' ? 'tRenew' : 'tNew';
-            
-            let labels = Object.keys(dataMap).filter(k => (dataMap[k][type+'Won'] + dataMap[k][type+'Commit'] + dataMap[k][type+'Upside'] + dataMap[k][type+'Open'] + dataMap[k][type+'Lost']) > 0 || (showTarget && dataMap[k][targetKey] > 0));
-            labels.sort((a,b) => {
-                if(showTarget) return dataMap[b][targetKey] - dataMap[a][targetKey]; 
-                const aTotal = dataMap[a][type+'Won'] + dataMap[a][type+'Commit'] + dataMap[a][type+'Upside'] + dataMap[a][type+'Open'] + dataMap[a][type+'Lost'];
-                const bTotal = dataMap[b][type+'Won'] + dataMap[b][type+'Commit'] + dataMap[b][type+'Upside'] + dataMap[b][type+'Open'] + dataMap[b][type+'Lost'];
-                return bTotal - aTotal; 
+
+            let labels = Object.keys(dataMap).filter(k => (dataMap[k][type + 'Won'] + dataMap[k][type + 'Commit'] + dataMap[k][type + 'Upside'] + dataMap[k][type + 'Open'] + dataMap[k][type + 'Lost']) > 0 || (showTarget && dataMap[k][targetKey] > 0));
+            labels.sort((a, b) => {
+                if (showTarget) return dataMap[b][targetKey] - dataMap[a][targetKey];
+                const aTotal = dataMap[a][type + 'Won'] + dataMap[a][type + 'Commit'] + dataMap[a][type + 'Upside'] + dataMap[a][type + 'Open'] + dataMap[a][type + 'Lost'];
+                const bTotal = dataMap[b][type + 'Won'] + dataMap[b][type + 'Commit'] + dataMap[b][type + 'Upside'] + dataMap[b][type + 'Open'] + dataMap[b][type + 'Lost'];
+                return bTotal - aTotal;
             });
             labels = labels.slice(0, 10);
-            
-            const dataWon = labels.map(k => dataMap[k][type+'Won']);
+
+            const dataWon = labels.map(k => dataMap[k][type + 'Won']);
             const dataCommit = labels.map(k => {
-                const w = dataMap[k][type+'Won'];
-                const c = dataMap[k][type+'Commit'];
+                const w = dataMap[k][type + 'Won'];
+                const c = dataMap[k][type + 'Commit'];
                 return [w, w + c];
             });
             const dataUpside = labels.map(k => {
-                const w = dataMap[k][type+'Won'];
-                const c = dataMap[k][type+'Commit'];
-                const u = dataMap[k][type+'Upside'];
+                const w = dataMap[k][type + 'Won'];
+                const c = dataMap[k][type + 'Commit'];
+                const u = dataMap[k][type + 'Upside'];
                 return [w + c, w + c + u];
             });
             const dataOpen = labels.map(k => {
-                const w = dataMap[k][type+'Won'];
-                const c = dataMap[k][type+'Commit'];
-                const u = dataMap[k][type+'Upside'];
-                const o = dataMap[k][type+'Open'];
+                const w = dataMap[k][type + 'Won'];
+                const c = dataMap[k][type + 'Commit'];
+                const u = dataMap[k][type + 'Upside'];
+                const o = dataMap[k][type + 'Open'];
                 return [w + c + u, w + c + u + o];
             });
             const dataLost = labels.map(k => {
-                const w = dataMap[k][type+'Won'];
-                const c = dataMap[k][type+'Commit'];
-                const u = dataMap[k][type+'Upside'];
-                const o = dataMap[k][type+'Open'];
-                const l = dataMap[k][type+'Lost'];
+                const w = dataMap[k][type + 'Won'];
+                const c = dataMap[k][type + 'Commit'];
+                const u = dataMap[k][type + 'Upside'];
+                const o = dataMap[k][type + 'Open'];
+                const l = dataMap[k][type + 'Lost'];
                 return [w + c + u + o, w + c + u + o + l];
             });
             const targetsData = labels.map(k => dataMap[k][targetKey]);
             const displayTargets = showTarget ? targetsData : [];
 
-            if (canvasId === 'chartRenew') { if(chartRenewInstance) chartRenewInstance.destroy(); }
-            else { if(chartNewInstance) chartNewInstance.destroy(); }
+            if (canvasId === 'chartRenew') { if (chartRenewInstance) chartRenewInstance.destroy(); }
+            else { if (chartNewInstance) chartNewInstance.destroy(); }
 
             let colorBase, colorCommit, colorUpside;
             if (type === 'renew') {
@@ -1060,16 +1812,16 @@
                     datasets: [
                         {
                             label: 'เป้าหมาย', data: displayTargets,
-                            backgroundColor: 'transparent', borderColor: colorBase, borderWidth: 2, borderSkipped: false,           
+                            backgroundColor: 'transparent', borderColor: colorBase, borderWidth: 2, borderSkipped: false,
                             barThickness: 40, order: 5, datalabels: { display: false }
                         },
                         {
                             label: 'ยอด Lost', data: dataLost,
-                            backgroundColor: 'rgba(239, 68, 68, 1)', borderColor: colorBase, 
-                            borderWidth: (context) => { const val = context.raw; return (val && val[1] > val[0]) ? 2 : 0; }, 
+                            backgroundColor: 'rgba(239, 68, 68, 1)', borderColor: colorBase,
+                            borderWidth: (context) => { const val = context.raw; return (val && val[1] > val[0]) ? 2 : 0; },
                             barThickness: 24, order: 4, borderSkipped: false,
-                            datalabels: { 
-                                display: function(context) { 
+                            datalabels: {
+                                display: function (context) {
                                     const lostAmt = context.dataset.data[context.dataIndex][1] - context.dataset.data[context.dataIndex][0];
                                     return lostAmt > 0;
                                 },
@@ -1081,25 +1833,25 @@
                                     const openAmt = dataOpen[ctx.dataIndex][1] - dataOpen[ctx.dataIndex][0];
                                     const lostAmt = val[1] - val[0];
                                     let text = numFormat.format(wonAmt);
-                                    if(showTarget) {
+                                    if (showTarget) {
                                         const target = targetsData[ctx.dataIndex];
-                                        if(target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
+                                        if (target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
                                     }
-                                    if(commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
-                                    if(upsideAmt > 0) text += ` + {Up ${numFormat.format(upsideAmt)}}`;
-                                    if(openAmt > 0) text += ` + {Open ${numFormat.format(openAmt)}}`;
-                                    if(lostAmt > 0) text += ` + {Lost ${numFormat.format(lostAmt)}}`;
+                                    if (commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
+                                    if (upsideAmt > 0) text += ` + {Up ${numFormat.format(upsideAmt)}}`;
+                                    if (openAmt > 0) text += ` + {Open ${numFormat.format(openAmt)}}`;
+                                    if (lostAmt > 0) text += ` + {Lost ${numFormat.format(lostAmt)}}`;
                                     return text;
                                 }
                             }
                         },
                         {
                             label: 'ยอด Open', data: dataOpen,
-                            backgroundColor: 'transparent', borderColor: colorBase, borderDash: [5, 5], 
-                            borderWidth: (context) => { const val = context.raw; return (val && val[1] > val[0]) ? 2 : 0; }, 
+                            backgroundColor: 'transparent', borderColor: colorBase, borderDash: [5, 5],
+                            borderWidth: (context) => { const val = context.raw; return (val && val[1] > val[0]) ? 2 : 0; },
                             barThickness: 24, order: 3, borderSkipped: false,
-                            datalabels: { 
-                                display: function(context) { 
+                            datalabels: {
+                                display: function (context) {
                                     const openAmt = context.dataset.data[context.dataIndex][1] - context.dataset.data[context.dataIndex][0];
                                     const lostAmt = dataLost[context.dataIndex][1] - dataLost[context.dataIndex][0];
                                     return openAmt > 0 && lostAmt === 0;
@@ -1111,22 +1863,22 @@
                                     const upsideAmt = dataUpside[ctx.dataIndex][1] - dataUpside[ctx.dataIndex][0];
                                     const openAmt = val[1] - val[0];
                                     let text = numFormat.format(wonAmt);
-                                    if(showTarget) {
+                                    if (showTarget) {
                                         const target = targetsData[ctx.dataIndex];
-                                        if(target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
+                                        if (target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
                                     }
-                                    if(commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
-                                    if(upsideAmt > 0) text += ` + {Up ${numFormat.format(upsideAmt)}}`;
-                                    if(openAmt > 0) text += ` + {Open ${numFormat.format(openAmt)}}`;
+                                    if (commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
+                                    if (upsideAmt > 0) text += ` + {Up ${numFormat.format(upsideAmt)}}`;
+                                    if (openAmt > 0) text += ` + {Open ${numFormat.format(openAmt)}}`;
                                     return text;
                                 }
                             }
                         },
                         {
                             label: 'ยอด Upside', data: dataUpside,
-                            backgroundColor: colorUpside, borderWidth: 0, barThickness: 24, order: 2, 
-                            datalabels: { 
-                                display: function(context) { 
+                            backgroundColor: colorUpside, borderWidth: 0, barThickness: 24, order: 2,
+                            datalabels: {
+                                display: function (context) {
                                     const upsideAmt = context.dataset.data[context.dataIndex][1] - context.dataset.data[context.dataIndex][0];
                                     const openAmt = dataOpen[context.dataIndex][1] - dataOpen[context.dataIndex][0];
                                     const lostAmt = dataLost[context.dataIndex][1] - dataLost[context.dataIndex][0];
@@ -1138,21 +1890,21 @@
                                     const commitAmt = dataCommit[ctx.dataIndex][1] - dataCommit[ctx.dataIndex][0];
                                     const upsideAmt = val[1] - val[0];
                                     let text = numFormat.format(wonAmt);
-                                    if(showTarget) {
+                                    if (showTarget) {
                                         const target = targetsData[ctx.dataIndex];
-                                        if(target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
+                                        if (target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
                                     }
-                                    if(commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
-                                    if(upsideAmt > 0) text += ` + {Up ${numFormat.format(upsideAmt)}}`;
+                                    if (commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
+                                    if (upsideAmt > 0) text += ` + {Up ${numFormat.format(upsideAmt)}}`;
                                     return text;
                                 }
                             }
                         },
                         {
                             label: 'ยอด Commit', data: dataCommit,
-                            backgroundColor: colorCommit, borderWidth: 0, barThickness: 24, order: 1, 
-                            datalabels: { 
-                                display: function(context) { 
+                            backgroundColor: colorCommit, borderWidth: 0, barThickness: 24, order: 1,
+                            datalabels: {
+                                display: function (context) {
                                     const commitAmt = context.dataset.data[context.dataIndex][1] - context.dataset.data[context.dataIndex][0];
                                     const upsideAmt = dataUpside[context.dataIndex][1] - dataUpside[context.dataIndex][0];
                                     const openAmt = dataOpen[context.dataIndex][1] - dataOpen[context.dataIndex][0];
@@ -1164,20 +1916,20 @@
                                     const wonAmt = dataWon[ctx.dataIndex];
                                     const commitAmt = val[1] - val[0];
                                     let text = numFormat.format(wonAmt);
-                                    if(showTarget) {
+                                    if (showTarget) {
                                         const target = targetsData[ctx.dataIndex];
-                                        if(target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
+                                        if (target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
                                     }
-                                    if(commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
+                                    if (commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
                                     return text;
                                 }
                             }
                         },
                         {
                             label: 'ยอด Won', data: dataWon,
-                            backgroundColor: colorBase, borderWidth: 0, barThickness: 24, order: 0, 
-                            datalabels: { 
-                                display: function(context) { 
+                            backgroundColor: colorBase, borderWidth: 0, barThickness: 24, order: 0,
+                            datalabels: {
+                                display: function (context) {
                                     const wonAmt = context.dataset.data[context.dataIndex];
                                     const commitAmt = dataCommit[context.dataIndex][1] - dataCommit[context.dataIndex][0];
                                     const upsideAmt = dataUpside[context.dataIndex][1] - dataUpside[context.dataIndex][0];
@@ -1189,9 +1941,9 @@
                                 formatter: (val, ctx) => {
                                     const wonAmt = val;
                                     let text = numFormat.format(wonAmt);
-                                    if(showTarget) {
+                                    if (showTarget) {
                                         const target = targetsData[ctx.dataIndex];
-                                        if(target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
+                                        if (target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
                                     }
                                     return text;
                                 }
@@ -1203,11 +1955,11 @@
                     responsive: true, maintainAspectRatio: false, indexAxis: 'y',
                     scales: { x: { beginAtZero: true, grid: { display: false } }, y: { grid: { display: false }, stacked: true } },
                     plugins: { legend: { display: false }, tooltip: { callbacks: { label: tooltipCallback } } },
-                    layout: { padding: { right: 220, top: 20 } } 
+                    layout: { padding: { right: 220, top: 20 } }
                 }
             });
 
-            if(canvasId === 'chartRenew') chartRenewInstance = newChart;
+            if (canvasId === 'chartRenew') chartRenewInstance = newChart;
             else chartNewInstance = newChart;
         }
 
@@ -1220,7 +1972,7 @@
             const colorUpside = 'rgba(30, 64, 175, 0.4)';
 
             chartMonthlyInstance = new Chart(ctx, {
-                type: 'bar', 
+                type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [
@@ -1238,8 +1990,8 @@
                             backgroundColor: 'rgba(239, 68, 68, 1)', borderColor: colorBase,
                             borderWidth: (context) => { const val = context.raw; return (val && val[1] > val[0]) ? 2 : 0; },
                             barThickness: 35, order: 5,
-                            datalabels: { 
-                                display: function(context) { 
+                            datalabels: {
+                                display: function (context) {
                                     const lostAmt = context.dataset.data[context.dataIndex][1] - context.dataset.data[context.dataIndex][0];
                                     return lostAmt > 0;
                                 },
@@ -1252,11 +2004,11 @@
                                     const lostAmt = val[1] - val[0];
                                     let text = numFormat.format(wonAmt);
                                     const target = targets[ctx.dataIndex];
-                                    if(target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
-                                    if(commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
-                                    if(upsideAmt > 0) text += ` + {Up ${numFormat.format(upsideAmt)}}`;
-                                    if(openAmt > 0) text += ` + {Open ${numFormat.format(openAmt)}}`;
-                                    if(lostAmt > 0) text += ` + {Lost ${numFormat.format(lostAmt)}}`;
+                                    if (target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
+                                    if (commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
+                                    if (upsideAmt > 0) text += ` + {Up ${numFormat.format(upsideAmt)}}`;
+                                    if (openAmt > 0) text += ` + {Open ${numFormat.format(openAmt)}}`;
+                                    if (lostAmt > 0) text += ` + {Lost ${numFormat.format(lostAmt)}}`;
                                     return text;
                                 }
                             }
@@ -1268,7 +2020,7 @@
                             backgroundColor: 'transparent', borderColor: colorBase, borderWidth: 2, borderDash: [5, 5],
                             barThickness: 35, order: 4, borderSkipped: false,
                             datalabels: {
-                                display: function(context) { 
+                                display: function (context) {
                                     const openAmt = context.dataset.data[context.dataIndex][1] - context.dataset.data[context.dataIndex][0];
                                     const lostAmt = actualsLostFloat[context.dataIndex][1] - actualsLostFloat[context.dataIndex][0];
                                     return openAmt > 0 && lostAmt === 0;
@@ -1281,10 +2033,10 @@
                                     const openAmt = val[1] - val[0];
                                     let text = numFormat.format(wonAmt);
                                     const target = targets[ctx.dataIndex];
-                                    if(target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
-                                    if(commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
-                                    if(upsideAmt > 0) text += ` + {Up ${numFormat.format(upsideAmt)}}`;
-                                    if(openAmt > 0) text += ` + {Open ${numFormat.format(openAmt)}}`;
+                                    if (target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
+                                    if (commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
+                                    if (upsideAmt > 0) text += ` + {Up ${numFormat.format(upsideAmt)}}`;
+                                    if (openAmt > 0) text += ` + {Open ${numFormat.format(openAmt)}}`;
                                     return text;
                                 }
                             }
@@ -1294,8 +2046,8 @@
                             label: 'ยอด Upside สะสม',
                             data: actualsUpsideFloat,
                             backgroundColor: colorUpside, barThickness: 35, order: 3,
-                            datalabels: { 
-                                display: function(context) { 
+                            datalabels: {
+                                display: function (context) {
                                     const upsideAmt = context.dataset.data[context.dataIndex][1] - context.dataset.data[context.dataIndex][0];
                                     const openAmt = actualsOpenFloat[context.dataIndex][1] - actualsOpenFloat[context.dataIndex][0];
                                     const lostAmt = actualsLostFloat[context.dataIndex][1] - actualsLostFloat[context.dataIndex][0];
@@ -1308,9 +2060,9 @@
                                     const upsideAmt = val[1] - val[0];
                                     let text = numFormat.format(wonAmt);
                                     const target = targets[ctx.dataIndex];
-                                    if(target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
-                                    if(commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
-                                    if(upsideAmt > 0) text += ` + {Up ${numFormat.format(upsideAmt)}}`;
+                                    if (target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
+                                    if (commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
+                                    if (upsideAmt > 0) text += ` + {Up ${numFormat.format(upsideAmt)}}`;
                                     return text;
                                 }
                             }
@@ -1320,8 +2072,8 @@
                             label: 'ยอด Commit สะสม',
                             data: actualsCommitFloat,
                             backgroundColor: colorCommit, barThickness: 35, order: 2,
-                            datalabels: { 
-                                display: function(context) { 
+                            datalabels: {
+                                display: function (context) {
                                     const commitAmt = context.dataset.data[context.dataIndex][1] - context.dataset.data[context.dataIndex][0];
                                     const upsideAmt = actualsUpsideFloat[context.dataIndex][1] - actualsUpsideFloat[context.dataIndex][0];
                                     const openAmt = actualsOpenFloat[context.dataIndex][1] - actualsOpenFloat[context.dataIndex][0];
@@ -1334,8 +2086,8 @@
                                     const commitAmt = val[1] - val[0];
                                     let text = numFormat.format(wonAmt);
                                     const target = targets[ctx.dataIndex];
-                                    if(target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
-                                    if(commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
+                                    if (target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
+                                    if (commitAmt > 0) text += ` + {C ${numFormat.format(commitAmt)}}`;
                                     return text;
                                 }
                             }
@@ -1345,8 +2097,8 @@
                             label: 'ยอด Won สะสม',
                             data: actualsWon,
                             backgroundColor: colorBase, barThickness: 35, order: 1,
-                            datalabels: { 
-                                display: function(context) { 
+                            datalabels: {
+                                display: function (context) {
                                     const wonAmt = context.dataset.data[context.dataIndex];
                                     const commitAmt = actualsCommitFloat[context.dataIndex][1] - actualsCommitFloat[context.dataIndex][0];
                                     const upsideAmt = actualsUpsideFloat[context.dataIndex][1] - actualsUpsideFloat[context.dataIndex][0];
@@ -1359,7 +2111,7 @@
                                     const wonAmt = val;
                                     let text = numFormat.format(wonAmt);
                                     const target = targets[ctx.dataIndex];
-                                    if(target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
+                                    if (target > 0) text += ` (${(wonAmt / target * 100).toFixed(1)}%)`;
                                     return text;
                                 }
                             }
@@ -1368,11 +2120,11 @@
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    scales: { 
-                        x: { grid: { display: false }, stacked: true }, 
-                        y: { beginAtZero: true, title: { display: true, text: 'จำนวนเงิน (Cumulative)' }, stacked: false } 
+                    scales: {
+                        x: { grid: { display: false }, stacked: true },
+                        y: { beginAtZero: true, title: { display: true, text: 'จำนวนเงิน (Cumulative)' }, stacked: false }
                     },
-                    plugins: { 
+                    plugins: {
                         legend: { position: 'bottom' },
                         tooltip: { callbacks: { label: tooltipCallback } }
                     },
@@ -1382,4 +2134,5 @@
         }
     </script>
 </body>
+
 </html>
