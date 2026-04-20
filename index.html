@@ -15,6 +15,9 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" charset="utf8"
         src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <!-- DataTables ColResize Plugin -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/datatables.net-colresize-unofficial@latest/jquery.dataTables.colResize.css">
+    <script src="https://cdn.jsdelivr.net/npm/datatables.net-colresize-unofficial@latest/jquery.dataTables.colResize.js"></script>
 
     <style>
         *,
@@ -1204,6 +1207,10 @@
                 pageLength: 100,
                 dom: 'lrtip',
                 autoWidth: false,
+                colResize: {
+                    isEnabled: true,
+                    hoverClass: 'dt-colresizable-hover'
+                },
                 order: [[0, "desc"]],
                 columns: [
                     { data: 0, width: "10%" },
