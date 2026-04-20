@@ -1203,15 +1203,16 @@
                 paging: true,
                 pageLength: 100,
                 dom: 'lrtip',
+                autoWidth: false,
                 order: [[0, "desc"]],
                 columns: [
-                    { data: 0 },
-                    { data: 1, render: function (data) { return `<span class="font-bold text-gray-800">${data}</span>`; } },
-                    { data: 2 },
-                    { data: 3, render: function (data) { return `<div class="truncate max-w-[200px]" title="${data}">${data}</div>`; } },
-                    { data: 4, className: "text-center" },
-                    { data: 5, className: "text-center" },
-                    { data: 6, className: "text-right font-medium text-gray-800", render: function (data) { return formatter.format(Math.round(Number(data) || 0)); } }
+                    { data: 0, width: "10%" },
+                    { data: 1, width: "18%", render: function (data) { return `<span class="font-bold text-gray-800">${data}</span>`; } },
+                    { data: 2, width: "8%", className: "text-center" },
+                    { data: 3, render: function (data) { return `<div class="truncate lg:whitespace-normal" title="${data}">${data}</div>`; } },
+                    { data: 4, width: "10%", className: "text-center" },
+                    { data: 5, width: "10%", className: "text-center" },
+                    { data: 6, width: "15%", className: "text-right font-medium text-gray-800", render: function (data) { return formatter.format(Math.round(Number(data) || 0)); } }
                 ]
             });
         }
