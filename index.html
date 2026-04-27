@@ -703,6 +703,10 @@
                 flex-direction: row;
             }
 
+            .md\:flex-1 {
+                flex: 1 1 0%;
+            }
+
             .md\:justify-between {
                 justify-content: space-between;
             }
@@ -713,6 +717,10 @@
 
             .md\:grid-cols-3 {
                 grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .md\:w-32 {
+                width: 8rem;
             }
 
             .md\:w-40 {
@@ -1017,28 +1025,46 @@
                     <h3 class="font-bold text-gray-700">📄 รายละเอียด Transaction</h3>
                 </div>
 
-                <!-- Custom Search 3 Criteria (AND) -->
-                <div
-                    class="mb-4 bg-gray-50 p-4 rounded border border-gray-200 flex flex-wrap items-center gap-3 shadow-sm">
-                    <span class="text-sm font-bold text-gray-700">🔍 ค้นหา (AND):</span>
-                    <input type="text" id="customSearch1" placeholder="คำค้นหาที่ 1..."
-                        class="p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none w-full md:w-40 transition">
-                    <span class="text-gray-400 font-bold hidden md:inline">+</span>
-                    <input type="text" id="customSearch2" placeholder="คำค้นหาที่ 2..."
-                        class="p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none w-full md:w-40 transition">
-                    <span class="text-gray-400 font-bold hidden md:inline">+</span>
-                    <input type="text" id="customSearch3" placeholder="คำค้นหาที่ 3..."
-                        class="p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none w-full md:w-40 transition">
-
-                    <button onclick="clearCustomSearch()"
-                        class="px-4 py-2 bg-gray-200 text-gray-700 font-semibold text-sm rounded hover:bg-gray-300 transition w-full md:w-auto mt-2 md:mt-0">
-                        ล้างคำค้นหา
-                    </button>
-
-                    <div class="flex items-center gap-2 ml-auto mt-2 md:mt-0">
-                        <span class="text-sm font-bold text-gray-700 whitespace-nowrap">ยอดรวม</span>
-                        <span id="tableTotalAmount"
-                            class="px-4 py-2 border border-blue-300 bg-blue-50 rounded text-sm font-bold text-blue-900 whitespace-nowrap min-w-[120px] text-right">0</span>
+                <!-- Custom Search 4 Criteria (AND) & Exclude -->
+                <div class="mb-4 bg-gray-50 p-4 rounded border border-gray-200 flex flex-col gap-3 shadow-sm">
+                    <div class="flex flex-wrap items-center gap-3 w-full">
+                        <span class="text-sm font-bold text-gray-700 whitespace-nowrap">🔍 ค้นหา (AND):</span>
+                        <input type="text" id="customSearch1" placeholder="คำค้นหาที่ 1..."
+                            class="p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none w-full md:flex-1 transition min-w-[80px]">
+                        <span class="text-gray-400 font-bold hidden md:inline">+</span>
+                        <input type="text" id="customSearch2" placeholder="คำค้นหาที่ 2..."
+                            class="p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none w-full md:flex-1 transition min-w-[80px]">
+                        <span class="text-gray-400 font-bold hidden md:inline">+</span>
+                        <input type="text" id="customSearch3" placeholder="คำค้นหาที่ 3..."
+                            class="p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none w-full md:flex-1 transition min-w-[80px]">
+                        <span class="text-gray-400 font-bold hidden md:inline">+</span>
+                        <input type="text" id="customSearch4" placeholder="คำค้นหาที่ 4..."
+                            class="p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none w-full md:flex-1 transition min-w-[80px]">
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3 w-full">
+                        <span class="text-sm font-bold text-red-600 whitespace-nowrap">🚫 ไม่รวม (NOT):</span>
+                        <input type="text" id="excludeSearch1" placeholder="ไม่รวมคำที่ 1..."
+                            class="p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-red-500 outline-none w-full md:flex-1 transition min-w-[80px]">
+                        <span class="text-gray-400 font-bold hidden md:inline">+</span>
+                        <input type="text" id="excludeSearch2" placeholder="ไม่รวมคำที่ 2..."
+                            class="p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-red-500 outline-none w-full md:flex-1 transition min-w-[80px]">
+                        <span class="text-gray-400 font-bold hidden md:inline">+</span>
+                        <input type="text" id="excludeSearch3" placeholder="ไม่รวมคำที่ 3..."
+                            class="p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-red-500 outline-none w-full md:flex-1 transition min-w-[80px]">
+                        <span class="text-gray-400 font-bold hidden md:inline">+</span>
+                        <input type="text" id="excludeSearch4" placeholder="ไม่รวมคำที่ 4..."
+                            class="p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-red-500 outline-none w-full md:flex-1 transition min-w-[80px]">
+                            
+                        <button onclick="clearCustomSearch()"
+                            class="px-4 py-2 bg-gray-200 text-gray-700 font-semibold text-sm rounded hover:bg-gray-300 transition w-full md:w-auto mt-2 md:mt-0 ml-0 md:ml-2">
+                            ล้างคำค้นหา
+                        </button>
+    
+                        <div class="flex items-center gap-2 ml-auto mt-2 md:mt-0 w-full md:w-auto justify-end">
+                            <span class="text-sm font-bold text-gray-700 whitespace-nowrap">ยอดรวม</span>
+                            <span id="tableTotalAmount"
+                                class="px-4 py-2 border border-blue-300 bg-blue-50 rounded text-sm font-bold text-blue-900 whitespace-nowrap min-w-[120px] text-right">0</span>
+                        </div>
                     </div>
                 </div>
 
@@ -1079,7 +1105,7 @@
         const formatter = new Intl.NumberFormat('th-TH', { style: 'decimal', minimumFractionDigits: 0, maximumFractionDigits: 0 });
         const numFormat = new Intl.NumberFormat('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
-        // --- Custom DataTables Filter (3 Criteria Search - AND) ---
+        // --- Custom DataTables Filter (4 Criteria Search - AND) ---
         $.fn.dataTable.ext.search.push(
             function (settings, data, dataIndex) {
                 if (settings.nTable.id !== 'TableDataList') {
@@ -1089,8 +1115,14 @@
                 const term1 = ($('#customSearch1').val() || "").toLowerCase().trim();
                 const term2 = ($('#customSearch2').val() || "").toLowerCase().trim();
                 const term3 = ($('#customSearch3').val() || "").toLowerCase().trim();
+                const term4 = ($('#customSearch4').val() || "").toLowerCase().trim();
 
-                if (!term1 && !term2 && !term3) return true;
+                const ex1 = ($('#excludeSearch1').val() || "").toLowerCase().trim();
+                const ex2 = ($('#excludeSearch2').val() || "").toLowerCase().trim();
+                const ex3 = ($('#excludeSearch3').val() || "").toLowerCase().trim();
+                const ex4 = ($('#excludeSearch4').val() || "").toLowerCase().trim();
+
+                if (!term1 && !term2 && !term3 && !term4 && !ex1 && !ex2 && !ex3 && !ex4) return true;
 
                 // จับรวมข้อมูลทุกคอลัมน์ในแถวเป็น String เดียวเพื่อค้นหา
                 const rowText = data.join(' ').toLowerCase();
@@ -1107,6 +1139,13 @@
                 if (term1 && !checkTerm(term1)) return false;
                 if (term2 && !checkTerm(term2)) return false;
                 if (term3 && !checkTerm(term3)) return false;
+                if (term4 && !checkTerm(term4)) return false;
+
+                // ตรวจสอบเงื่อนไข NOT (Exclude)
+                if (ex1 && checkTerm(ex1)) return false;
+                if (ex2 && checkTerm(ex2)) return false;
+                if (ex3 && checkTerm(ex3)) return false;
+                if (ex4 && checkTerm(ex4)) return false;
 
                 // ผ่านทุกเงื่อนไข (AND) ให้แสดงผล
                 return true;
@@ -1137,7 +1176,7 @@
             })();
 
             // เมื่อพิมพ์ค้นหา ให้สั่ง Table อัปเดตทันที
-            $('#customSearch1, #customSearch2, #customSearch3').on('input', function () {
+            $('#customSearch1, #customSearch2, #customSearch3, #customSearch4, #excludeSearch1, #excludeSearch2, #excludeSearch3, #excludeSearch4').on('input', function () {
                 if (dataTableInstance) {
                     dataTableInstance.draw();
                     updateTableTotal();
@@ -1149,6 +1188,11 @@
             $('#customSearch1').val('');
             $('#customSearch2').val('');
             $('#customSearch3').val('');
+            $('#customSearch4').val('');
+            $('#excludeSearch1').val('');
+            $('#excludeSearch2').val('');
+            $('#excludeSearch3').val('');
+            $('#excludeSearch4').val('');
             if (dataTableInstance) {
                 dataTableInstance.draw();
                 updateTableTotal();
@@ -1322,7 +1366,7 @@
             let isTransactionSection = false;
             let foundTransHeader = false;
 
-            let tIdx = { sales: -1, group: -1, renewTarget: -1, newTarget: -1 };
+            let tIdx = { sales: -1, group: -1, renewTarget: -1, newTarget: -1, renewYear: -1, newYear: -1, monthlyRenew: {}, monthlyNew: {} };
             let transIdx = { sales: -1, date: -1, cust: -1, type: -1, status: -1, amount: -1 };
 
             for (let i = 0; i < rows.length; i++) {
@@ -1332,13 +1376,26 @@
                 if (row[0].toString().toLowerCase().includes('sales')) {
                     const cleanRow = row.map(c => (c || "").toString().toLowerCase().trim().replace(/^\ufeff/, ''));
 
-                    if (cleanRow.some(c => c.includes('target'))) {
+                    const hasTargetKeyword = cleanRow.some(c => c.includes('target') || c.match(/renew 20\d{2}/) || c.match(/new 20\d{2}/));
+                    if (hasTargetKeyword) {
                         isTargetSection = true;
                         isTransactionSection = false;
                         tIdx.sales = cleanRow.indexOf('sales');
                         tIdx.group = cleanRow.findIndex(c => c.includes('sale group') || c.includes('group'));
+
                         tIdx.renewTarget = cleanRow.findIndex(c => c.includes('renew') && c.includes('target'));
                         tIdx.newTarget = cleanRow.findIndex(c => c.includes('new') && !c.includes('renew') && c.includes('target'));
+                        tIdx.renewYear = cleanRow.findIndex(c => c.match(/^renew\s+20\d{2}$/));
+                        tIdx.newYear = cleanRow.findIndex(c => c.match(/^new\s+20\d{2}$/));
+
+                        tIdx.monthlyRenew = {};
+                        tIdx.monthlyNew = {};
+                        cleanRow.forEach((col, index) => {
+                            let mRenew = col.match(/^renew\s+(20\d{2}-\d{2})$/);
+                            if (mRenew) tIdx.monthlyRenew[mRenew[1]] = index;
+                            let mNew = col.match(/^new\s+(20\d{2}-\d{2})$/);
+                            if (mNew) tIdx.monthlyNew[mNew[1]] = index;
+                        });
                         continue;
                     }
 
@@ -1361,10 +1418,25 @@
                     if (name) {
                         const cleanName = name.toString().trim();
                         const group = tIdx.group !== -1 ? (row[tIdx.group] || "Other").toString().trim() : "Other";
-                        const tRenew = tIdx.renewTarget !== -1 ? cleanNum(row[tIdx.renewTarget]) : 0;
-                        const tNew = tIdx.newTarget !== -1 ? cleanNum(row[tIdx.newTarget]) : 0;
 
-                        targets[cleanName] = { group: group, renew: tRenew, new: tNew };
+                        let tRenew = 0;
+                        if (tIdx.renewTarget !== -1) tRenew = cleanNum(row[tIdx.renewTarget]);
+                        else if (tIdx.renewYear !== -1) tRenew = cleanNum(row[tIdx.renewYear]);
+
+                        let tNew = 0;
+                        if (tIdx.newTarget !== -1) tNew = cleanNum(row[tIdx.newTarget]);
+                        else if (tIdx.newYear !== -1) tNew = cleanNum(row[tIdx.newYear]);
+
+                        let mRenew = {};
+                        let mNew = {};
+                        for (let m in tIdx.monthlyRenew) {
+                            mRenew[m] = cleanNum(row[tIdx.monthlyRenew[m]]);
+                        }
+                        for (let m in tIdx.monthlyNew) {
+                            mNew[m] = cleanNum(row[tIdx.monthlyNew[m]]);
+                        }
+
+                        targets[cleanName] = { group: group, renew: tRenew, new: tNew, monthlyRenew: mRenew, monthlyNew: mNew };
                         if (group && group !== "Other") groups.add(group);
                     }
                 }
@@ -1525,6 +1597,25 @@
                 const chartData = {};
                 const monthlyWon = {}, monthlyCommit = {}, monthlyUpside = {}, monthlyLost = {}, monthlyOpen = {};
 
+                function getTargetForSale(saleName, isFiltered, dMonths) {
+                    const t = targets[saleName];
+                    if (!t) return { renew: 0, new: 0 };
+                    let rt = 0, nt = 0;
+                    if (isFiltered && (Object.keys(t.monthlyRenew).length > 0 || Object.keys(t.monthlyNew).length > 0)) {
+                        dMonths.forEach(m => {
+                            rt += (t.monthlyRenew[m] || 0);
+                            nt += (t.monthlyNew[m] || 0);
+                        });
+                    } else if (isFiltered) {
+                        rt = (t.renew / 12) * dMonths.length;
+                        nt = (t.new / 12) * dMonths.length;
+                    } else {
+                        rt = t.renew;
+                        nt = t.new;
+                    }
+                    return { renew: rt, new: nt };
+                }
+
                 if (viewMode === 'byGroup') {
                     const relevantGroups = selGroup === 'all' ? [...groups] : [selGroup];
                     relevantGroups.forEach(g => chartData[g] = { renewWon: 0, renewCommit: 0, renewUpside: 0, renewOpen: 0, renewLost: 0, newWon: 0, newCommit: 0, newUpside: 0, newOpen: 0, newLost: 0, tRenew: 0, tNew: 0 });
@@ -1532,11 +1623,12 @@
                     Object.keys(targets).forEach(name => {
                         const g = targets[name].group;
                         if (chartData[g]) {
-                            chartData[g].tRenew += targets[name].renew;
-                            chartData[g].tNew += targets[name].new;
+                            const calT = getTargetForSale(name, isMonthFiltered, displayMonths);
+                            chartData[g].tRenew += calT.renew;
+                            chartData[g].tNew += calT.new;
                             if (selGroup === 'all' || selGroup === g) {
-                                tarRenew += targets[name].renew;
-                                tarNew += targets[name].new;
+                                tarRenew += calT.renew;
+                                tarNew += calT.new;
                             }
                         }
                     });
@@ -1559,8 +1651,9 @@
                     if (selSale === 'all') {
                         Object.keys(targets).forEach(name => {
                             if (selGroup === 'all' || targets[name].group === selGroup) {
-                                chartData[name] = { renewWon: 0, renewCommit: 0, renewUpside: 0, renewOpen: 0, renewLost: 0, newWon: 0, newCommit: 0, newUpside: 0, newOpen: 0, newLost: 0, tRenew: targets[name].renew, tNew: targets[name].new };
-                                tarRenew += targets[name].renew; tarNew += targets[name].new;
+                                const calT = getTargetForSale(name, isMonthFiltered, displayMonths);
+                                chartData[name] = { renewWon: 0, renewCommit: 0, renewUpside: 0, renewOpen: 0, renewLost: 0, newWon: 0, newCommit: 0, newUpside: 0, newOpen: 0, newLost: 0, tRenew: calT.renew, tNew: calT.new };
+                                tarRenew += calT.renew; tarNew += calT.new;
                             }
                         });
                         filtered.forEach(t => {
@@ -1580,8 +1673,9 @@
                         });
                     } else {
                         if (targets[selSale]) {
-                            tarRenew = targets[selSale].renew;
-                            tarNew = targets[selSale].new;
+                            const calT = getTargetForSale(selSale, isMonthFiltered, displayMonths);
+                            tarRenew = calT.renew;
+                            tarNew = calT.new;
                         }
                         filtered.forEach(t => {
                             if (!chartData[t.cust]) chartData[t.cust] = { renewWon: 0, renewCommit: 0, renewUpside: 0, renewOpen: 0, renewLost: 0, newWon: 0, newCommit: 0, newUpside: 0, newOpen: 0, newLost: 0, tRenew: 0, tNew: 0 };
@@ -1610,15 +1704,8 @@
                     else if (t.status === 'open') monthlyOpen[ym] += t.amount;
                 });
 
-                let runningWon = 0, runningCommit = 0, runningUpside = 0, runningLost = 0, runningOpen = 0;
+                let runningWon = 0, runningCommit = 0, runningUpside = 0, runningLost = 0, runningOpen = 0, runningTarget = 0;
                 const cumWon = [], cumCommitFloat = [], cumUpsideFloat = [], cumLostFloat = [], cumOpenFloat = [], cumTargets = [];
-
-                const totalAnnualTarget = Object.keys(targets).reduce((acc, name) => {
-                    if (selGroup === 'all' || targets[name].group === selGroup) {
-                        if (selSale === 'all' || selSale === name) { return acc + targets[name].renew + targets[name].new; }
-                    }
-                    return acc;
-                }, 0);
 
                 displayMonths.forEach((m, idx) => {
                     runningWon += (monthlyWon[m] || 0);
@@ -1627,13 +1714,28 @@
                     runningLost += (monthlyLost[m] || 0);
                     runningOpen += (monthlyOpen[m] || 0);
 
+                    let mTarget = 0;
+                    Object.keys(targets).forEach(name => {
+                        if (selGroup === 'all' || targets[name].group === selGroup) {
+                            if (selSale === 'all' || selSale === name) {
+                                const t = targets[name];
+                                if (Object.keys(t.monthlyRenew).length > 0 || Object.keys(t.monthlyNew).length > 0) {
+                                    mTarget += (t.monthlyRenew[m] || 0) + (t.monthlyNew[m] || 0);
+                                } else {
+                                    mTarget += (t.renew + t.new) / 12; // Fallback
+                                }
+                            }
+                        }
+                    });
+                    runningTarget += mTarget;
+
                     cumWon.push(runningWon);
                     cumCommitFloat.push([runningWon, runningWon + runningCommit]);
                     cumUpsideFloat.push([runningWon + runningCommit, runningWon + runningCommit + runningUpside]);
                     cumOpenFloat.push([runningWon + runningCommit + runningUpside, runningWon + runningCommit + runningUpside + runningOpen]);
                     cumLostFloat.push([runningWon + runningCommit + runningUpside + runningOpen, runningWon + runningCommit + runningUpside + runningOpen + runningLost]);
 
-                    cumTargets.push((totalAnnualTarget / 12) * (idx + 1));
+                    cumTargets.push(runningTarget);
                 });
 
                 let actTotalWon = actRenewWon + actNewWon;
