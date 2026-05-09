@@ -803,35 +803,38 @@
                     ล้างหน้าจอ
                 </button>
                 <span class="px-2 py-1 rounded text-xs font-bold border border-gray-300 text-gray-600">Rev.1.4</span>
-                <button onclick="openSettings()" class="text-gray-500 hover:text-gray-700 transition ml-1" title="ตั้งค่าระบบ">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                </button>
             </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
             <div class="lg:col-span-12 xl:col-span-7 card border-l-4 border-blue-500">
-                <span class="block text-sm font-semibold text-gray-700 mb-4">📁 นำเข้าข้อมูล</span>
+                <span class="block text-sm font-semibold text-gray-700 mb-4">📁 นำเข้าข้อมูล
+                    (เลือกวิธีใดวิธีหนึ่ง)</span>
+
+                <div class="mb-4">
+                    <span class="text-xs font-bold text-blue-600 mb-1 block">วิธีที่ 1: วางลิงก์ Google Sheet</span>
+                    <div class="flex gap-2">
+                        <input type="text" id="sheetUrl" placeholder="วางลิงก์ที่ได้จาก Publish to web ที่นี่..."
+                            class="flex-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                        <button onclick="loadFromUrl()"
+                            class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 font-medium transition text-sm">
+                            ดึงข้อมูล
+                        </button>
+                    </div>
+                </div>
+
+                <div class="relative flex py-2 items-center">
+                    <div class="flex-grow border-t border-gray-200"></div>
+                    <span class="flex-shrink-0 mx-4 text-gray-400 text-xs">หรือ</span>
+                    <div class="flex-grow border-t border-gray-200"></div>
+                </div>
 
                 <div class="mt-4">
-                    <span class="text-xs font-bold text-green-600 mb-1 block">อัปโหลดไฟล์ .csv จากคอมพิวเตอร์</span>
-                    <div class="flex flex-col gap-2">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="text-sm font-semibold text-gray-600 min-w-[100px]">ไฟล์เป้าหมาย:</span>
-                            <span id="targetFileStatus" class="text-sm text-gray-500">รอการดาวน์โหลด...</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm font-semibold text-gray-600 min-w-[100px]">ไฟล์ยอดขาย:</span>
-                            <input type="file" id="csvFileAmount" accept=".csv"
-                                class="flex-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 outline-none text-sm file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-green-600 file:text-white hover:file:bg-green-700 cursor-pointer">
-                        </div>
-                        <button onclick="loadFromFiles()"
-                            class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 font-medium transition text-sm w-full md:w-auto self-start mt-1">
-                            ประมวลผลไฟล์ยอดขาย
-                        </button>
+                    <span class="text-xs font-bold text-green-600 mb-1 block">วิธีที่ 2: อัปโหลดไฟล์ .csv
+                        จากคอมพิวเตอร์</span>
+                    <div class="flex gap-2 items-center">
+                        <input type="file" id="csvFileInput" accept=".csv"
+                            class="flex-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 outline-none text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-600 file:text-white hover:file:bg-green-700 cursor-pointer">
                     </div>
                 </div>
             </div>
@@ -1114,29 +1117,6 @@
         </div>
     </div>
 
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
-        <div class="bg-white rounded-lg p-6 w-96 max-w-full mx-4 shadow-xl">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">⚙️ การตั้งค่าระบบ</h2>
-            
-            <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700 mb-1">ชื่อไฟล์เป้าหมายยอดขาย (Sale Target CSV)</label>
-                <input type="text" id="settingTargetFile" placeholder="เช่น Sale Target 2026_r1.5.csv"
-                    class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm">
-                <p class="text-xs text-gray-500 mt-1">ไฟล์นี้จะถูกโหลดอัตโนมัติเมื่อเปิดโปรแกรม</p>
-            </div>
-            
-            <div class="flex justify-end gap-2 mt-6">
-                <button onclick="closeSettings()" class="px-4 py-2 border border-gray-300 rounded text-gray-600 hover:bg-gray-100 transition text-sm font-medium">
-                    ยกเลิก
-                </button>
-                <button onclick="saveSettings()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm font-medium">
-                    บันทึกการตั้งค่า
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script>
         Chart.register(ChartDataLabels);
         let transactions = [];
@@ -1153,51 +1133,6 @@
 
         const formatter = new Intl.NumberFormat('th-TH', { style: 'decimal', minimumFractionDigits: 0, maximumFractionDigits: 0 });
         const numFormat = new Intl.NumberFormat('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-
-        let targetFileName = localStorage.getItem('targetFileName') || 'Sale Target 2026_r1.5.csv';
-        let parsedTargetData = null;
-
-        function openSettings() {
-            document.getElementById('settingTargetFile').value = targetFileName;
-            document.getElementById('settingsModal').classList.remove('hidden');
-        }
-
-        function closeSettings() {
-            document.getElementById('settingsModal').classList.add('hidden');
-        }
-
-        function saveSettings() {
-            const val = document.getElementById('settingTargetFile').value.trim();
-            if (val) {
-                targetFileName = val;
-                localStorage.setItem('targetFileName', targetFileName);
-                closeSettings();
-                autoLoadTargetFile();
-            } else {
-                alert("กรุณาระบุชื่อไฟล์");
-            }
-        }
-
-        function autoLoadTargetFile() {
-            const statusEl = document.getElementById('targetFileStatus');
-            if(statusEl) statusEl.innerHTML = `<span class="text-yellow-600">กำลังดาวน์โหลด... (${targetFileName})</span>`;
-            
-            Papa.parse(targetFileName, {
-                download: true,
-                header: false,
-                skipEmptyLines: true,
-                worker: true,
-                complete: function (results) { 
-                    parsedTargetData = results.data;
-                    if(statusEl) statusEl.innerHTML = `<span class="text-green-600 font-bold">✅ โหลดสำเร็จ (${targetFileName})</span>`;
-                },
-                error: function (err) { 
-                    parsedTargetData = null;
-                    if(statusEl) statusEl.innerHTML = `<span class="text-red-600 font-bold">❌ ไม่พบไฟล์ (${targetFileName})</span>`;
-                    console.error("Auto load target file error:", err);
-                }
-            });
-        }
 
         // --- Custom DataTables Filter (4 Criteria Search - AND) ---
         $.fn.dataTable.ext.search.push(
@@ -1247,8 +1182,6 @@
         );
 
         $(document).ready(function () {
-            autoLoadTargetFile();
-            
             // ตั้งค่า Default ช่วงเวลาจากวันที่ปัจจุบัน
             (function initPeriodDefaults() {
                 const now = new Date();
@@ -1327,7 +1260,8 @@
             targets = {};
             groups = new Set();
             document.getElementById('dashboardContent').classList.add('hidden');
-            document.getElementById('csvFileAmount').value = '';
+            document.getElementById('sheetUrl').value = '';
+            document.getElementById('csvFileInput').value = '';
             clearCustomSearch();
             if (dataTableInstance) { dataTableInstance.clear().draw(); }
             updateStatus('success', 'ล้างข้อมูลเสร็จสิ้น');
@@ -1363,48 +1297,52 @@
             });
         }
 
-        function processCombinedData(amountRows, targetRows) {
-            const combinedRows = [...(targetRows || []), ...(amountRows || [])];
-            setTimeout(() => {
-                if (processData(combinedRows)) {
-                    updateStatus('success', 'เชื่อมต่อข้อมูลสำเร็จ');
-                    document.getElementById('dashboardContent').classList.remove('hidden');
-                } else {
-                    updateStatus('error', 'รูปแบบข้อมูลไม่ถูกต้อง');
-                }
+        function handleParseResult(results) {
+            if (results.data && results.data.length > 0) {
+                setTimeout(() => {
+                    if (processData(results.data)) {
+                        updateStatus('success', 'เชื่อมต่อข้อมูลสำเร็จ');
+                        document.getElementById('dashboardContent').classList.remove('hidden');
+                    } else {
+                        updateStatus('error', 'รูปแบบข้อมูลไม่ถูกต้อง');
+                    }
+                    showLoading(false);
+                }, 100);
+            } else {
+                updateStatus('error', 'ไม่พบข้อมูล');
                 showLoading(false);
-            }, 100);
+            }
         }
 
-        function loadFromFiles() {
-            const fileAmount = document.getElementById('csvFileAmount').files[0];
-
-            if (!fileAmount) {
-                alert("กรุณาเลือกไฟล์ยอดขาย (Sale Amount)");
-                return;
-            }
-
-            if (!parsedTargetData) {
-                alert("ไฟล์เป้าหมาย (Sale Target) ยังโหลดไม่สำเร็จ หรือไม่มีข้อมูล กรุณาตรวจสอบการตั้งค่ามุมขวาบน");
-                return;
-            }
-
+        function loadFromUrl() {
+            const url = document.getElementById('sheetUrl').value.trim();
+            if (!url) { alert("กรุณาวางลิงก์ Google Sheet ก่อนค่ะ"); return; }
             showLoading(true);
-            updateStatus('loading', 'กำลังอ่านไฟล์ยอดขาย...');
-
-            Papa.parse(fileAmount, {
+            updateStatus('loading', 'กำลังดึงข้อมูลจากลิงก์...');
+            Papa.parse(url, {
+                download: true,
                 header: false,
                 skipEmptyLines: true,
                 worker: true,
-                complete: function (results) { 
-                    processCombinedData(results.data, parsedTargetData);
-                },
-                error: function (err) { 
-                    updateStatus('error', 'การอ่านไฟล์ยอดขายล้มเหลว'); 
-                    showLoading(false); 
-                }
+                complete: function (results) { handleParseResult(results); },
+                error: function (err) { updateStatus('error', 'ดึงข้อมูลล้มเหลว ตรวจสอบลิงก์อีกครั้ง'); showLoading(false); }
             });
         }
+
+        document.getElementById('csvFileInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            showLoading(true);
+            updateStatus('loading', 'กำลังอ่านไฟล์...');
+
+            Papa.parse(file, {
+                header: false,
+                skipEmptyLines: true,
+                worker: true,
+                complete: function (results) { handleParseResult(results); },
+                error: function (err) { updateStatus('error', 'การอ่านไฟล์ล้มเหลว'); showLoading(false); }
+            });
+        });
 
         function updateStatus(type, text) {
             const el = document.getElementById('statusIndicator');
